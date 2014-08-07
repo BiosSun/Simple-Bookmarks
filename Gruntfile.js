@@ -83,6 +83,12 @@ module.exports = function (grunt) {
         compass: {
             src: {
                 options: {
+                    httpPath: '',
+                    cssDir: '<%= config.appCSS %>',
+                    sassDir: '<%= config.appSASS %>',
+                    imageDir: '<%= config.appImages %>',
+                    javascriptsDir: '<%= config.appJS %>',
+                    fontsDir: '<%= config.appFonts %>',
                     httpStylesheetsPath: '<%= config.httpCSS %>',
                     httpImagesPath: '<%= config.httpImages %>',
                     httpJavascriptsPath: '<%= config.httpJS %>',
