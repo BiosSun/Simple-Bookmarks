@@ -1,0 +1,17 @@
+{
+    "name" : "Simple Bookmarks",
+    "version" : "0.0.1",
+    "description" : "一个简单的书签浏览工具，一个强大的书签整理工具。",
+    "icons" : {
+        "128" : "icon_128.png"
+    },
+
+    "manifest_version": 2,
+    "background_page" : "bg.html",
+
+    "browser_action" : {
+        "default_title" : "Simple Bookmarks",
+        "default_icon" : "icon_128.png",
+        "default_popup" : "popup.html"
+    }
+}
