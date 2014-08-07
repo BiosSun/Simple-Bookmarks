@@ -1,0 +1,9 @@
+{
+  "name": "windmill-village",
+  "private": true,
+  "dependencies": {
+    "jquery": "~1.11.1",
+    "mocha": "~1.21.3"
+  },
+  "devDependencies": {}
+}
