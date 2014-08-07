@@ -1,0 +1,64 @@
+$fa-css-prefix: icon;
+
+@import "compass";
+@import "vendors/font-awesome/font-awesome";
+
+body {
+    font: 12px/1.4285 arial,sans-serif;
+    color: #333;
+}
+
+a {
+    text-decoration: none;
+}
+
+.bm-list, .bm-sublist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.bm-sublist {
+    margin-left: 25px;
+}
+
+.bm-item {
+}
+
+.bm-item-title {
+    display: block;
+    color: #333;
+    line-height: 20px;
+
+    @include ellipsis;
+
+    &:before {
+        display: inline-block;
+
+        width: 20px;
+        height: 20px;
+        margin: 0 5px 0 0;
+
+        font: 16px/20px FontAwesome;
+
+        overflow: hidden;
+        text-align: center;
+        vertical-align: middle;
+    }
+}
+
+.bm-item-directory > .bm-item-title:before {
+    content: "\f07b";
+}
+
+.bm-item-directory.open > .bm-item-title:before {
+    content: "\f07c";
+}
+
+.bm-item-bookmark > .bm-item-title:before {
+    content: "\f15b";
+}
+
+#bookmarks {
+    width: 500px;
+}

@@ -3,6 +3,9 @@
     "version" : "0.0.1",
     "description" : "一个简单的书签浏览工具，一个强大的书签整理工具。",
     "icons" : {
+        "16" : "images/icon_16.png",
+        "24" : "images/icon_24.png",
+        "48" : "images/icon_48.png",
         "128" : "images/icon_128.png"
     },
 
@@ -11,7 +14,11 @@
 
     "browser_action" : {
         "default_title" : "Simple Bookmarks",
-        "default_icon" : "images/icon_128.png",
+        "default_icon" : "images/icon_24.png",
         "default_popup" : "popup.html"
-    }
+    },
+
+    "permissions": [
+        "bookmarks"
+    ]
 }
