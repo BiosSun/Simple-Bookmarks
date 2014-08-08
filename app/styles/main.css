@@ -2460,27 +2460,33 @@
 }
 
 /* line 6, ../sass/main.scss */
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+/* line 12, ../sass/main.scss */
 body {
   font: 12px/1.4285 arial,sans-serif;
   color: #333;
   margin: 0;
-  padding: 48px 8px 8px;
+  padding: 40px 0 0;
   width: 400px;
-  min-height: 300px;
 }
 
-/* line 15, ../sass/main.scss */
+/* line 20, ../sass/main.scss */
 a {
   text-decoration: none;
 }
 
-/* line 19, ../sass/main.scss */
+/* line 24, ../sass/main.scss */
 button, input, select {
   color: inherit;
 }
 
-/* line 23, ../sass/main.scss */
-.search-box {
+/* line 28, ../sass/main.scss */
+#search-box {
   position: fixed;
   top: 0;
   left: 0;
@@ -2491,25 +2497,8 @@ button, input, select {
   border-bottom: 1px solid #ddd;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
-/* line 36, ../sass/main.scss */
-.search-box input[type=text] {
-  box-sizing: border-box;
-  width: 100%;
-  height: 22px;
-  padding: 0 7px 0 23px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-  color: #aaa;
-}
-/* line 48, ../sass/main.scss */
-.search-box input[type=text]:focus {
-  outline: none;
-  border-color: #87A9C4;
-  color: inherit;
-}
-/* line 55, ../sass/main.scss */
-.search-box .icon {
+/* line 41, ../sass/main.scss */
+#search-box .icon {
   width: 20px;
   height: 20px;
   line-height: 20px;
@@ -2520,19 +2509,36 @@ button, input, select {
   color: #87A9C4;
 }
 
-/* line 67, ../sass/main.scss */
+/* line 53, ../sass/main.scss */
+#search {
+  width: 100%;
+  height: 22px;
+  padding: 0 7px 0 23px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  color: #aaa;
+}
+/* line 63, ../sass/main.scss */
+#search:focus {
+  outline: none;
+  border-color: #87A9C4;
+  color: inherit;
+}
+
+/* line 70, ../sass/main.scss */
 .bm-list, .bm-sublist {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-/* line 73, ../sass/main.scss */
+/* line 76, ../sass/main.scss */
 .bm-sublist {
   margin-left: 25px;
 }
 
-/* line 80, ../sass/main.scss */
+/* line 83, ../sass/main.scss */
 .bm-item-title {
   display: block;
   color: #333;
@@ -2546,12 +2552,12 @@ button, input, select {
   padding-left: 2700px;
   cursor: pointer;
 }
-/* line 92, ../sass/main.scss */
+/* line 95, ../sass/main.scss */
 .bm-item-title:hover {
   background: #e0e0e0;
 }
 
-/* line 97, ../sass/main.scss */
+/* line 100, ../sass/main.scss */
 .bm-item-favicon {
   display: inline-block;
   width: 20px;
@@ -2564,34 +2570,41 @@ button, input, select {
   color: #87A9C4;
 }
 
-/* line 113, ../sass/main.scss */
+/* line 116, ../sass/main.scss */
 .bm-item-directory > .bm-item-title > .bm-item-favicon:before {
   content: "\f07b";
 }
 
-/* line 118, ../sass/main.scss */
+/* line 121, ../sass/main.scss */
 .bm-item-directory.open > .bm-item-title > .bm-item-favicon:before {
   content: "\f07c";
 }
 
-/* line 123, ../sass/main.scss */
+/* line 126, ../sass/main.scss */
 .bm-item-separator > .bm-item-title {
   position: relative;
 }
-/* line 126, ../sass/main.scss */
+/* line 129, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .line {
   display: block;
   margin: 9px 0 -10px;
   border-bottom: 1px dashed #bbb;
 }
-/* line 132, ../sass/main.scss */
+/* line 135, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .text {
   margin-left: 20px;
   padding: 0 5px;
   color: #999;
   background: #fff;
 }
-/* line 140, ../sass/main.scss */
+/* line 143, ../sass/main.scss */
 .bm-item-separator > .bm-item-title:hover .text {
   background: #e0e0e0;
+}
+
+/* line 149, ../sass/main.scss */
+#bookmarks {
+  height: 500px;
+  overflow-y: auto;
+  padding: 8px;
 }

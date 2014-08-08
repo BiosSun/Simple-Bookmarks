@@ -3,11 +3,19 @@ $(function() {
 
     var doc = $(document),
 
+        BM_ITEM_TYPE_DIRECTORY = 1,
+        BM_ITEM_TYPE_BOOKMARK = 2,
+        BM_ITEM_TYPE_SEPARATOR = 3,
+
         _rspace = /\s/g,
         _rseparator = /[\s-]/g,
 
         bmRootList = $('#bookmarks'),
-        bmItems = {};
+        searchInput = $('#search'),
+        bmItems = {
+            allItems: [],
+            allBookmarkItems: []
+        };
 
     simpleBookmarks.traversalBookmarks(
         function(node) {
@@ -45,6 +53,39 @@ $(function() {
         return false;
     });
 
+    searchInput.on('keyup', function() {
+        var input = $(this);
+        searchItems(input.val());
+    });
+
+    // 根据一个字符串查询书签项
+    function searchItems(searchText) {
+        var result = [];
+
+        searchText = $.trim(searchText).toLowerCase();
+
+        if (searchText) {
+            bmRootList.children().detach();
+
+            $.each(bmItems.allBookmarkItems, function(i, item) {
+                var title = item.data.title.toLowerCase(),
+                    url = item.data.url.toLowerCase();
+
+                if (title.indexOf(searchText) !== -1 ||
+                   url.indexOf(searchText) !== -1) {
+                    result.push(item);
+                }
+            });
+        }
+        else {
+            result = bmItems.allItems;
+        }
+
+        $.each(result, function(i, item) {
+            insertItem(item);
+        });
+    }
+
     // 切换一个书签目录项的打开与关闭状态
     function toggleBMItem(item, sw) {
         if (sw || !item.isOpen) {
@@ -75,29 +116,34 @@ $(function() {
         }
     }
 
-    // 创建一个书签项
+    /**
+     * 创建并注册一个书签项
+     */
     function createBMItem(node) {
-        var itemEl, item;
+        var item = {
+            id: node.id,
+            data: node
+        };
 
         if (!node.title) { return null; }
 
         if (node.children) {
-            itemEl = createBMDirectoryItemEl(node);
+            item.el = createBMDirectoryItemEl(node);
+            item.type = BM_ITEM_TYPE_DIRECTORY;
         }
         else if (node.title.replace(_rspace, '').substring(0, 5) === '-----') {
-            itemEl = createBMSeparatorItemEl(node);
+            item.el = createBMSeparatorItemEl(node);
+            item.type = BM_ITEM_TYPE_SEPARATOR;
         }
         else if (node.url) {
-            itemEl = createBMBookmarkItemEl(node);
+            item.el = createBMBookmarkItemEl(node);
+            item.type = BM_ITEM_TYPE_BOOKMARK;
+            bmItems.allBookmarkItems.push(item);
         }
 
-        item = {
-            id: node.id,
-            el: itemEl,
-            data: node
-        };
-
         bmItems[node.id] = item;
+        bmItems.allItems.push(item);
+
         return item;
     }
 
@@ -158,14 +204,18 @@ $(function() {
     }
 
     /**
-     * 将一个书签项插入到书签列表中
+     * 将一个书签项插入到书签列表中，
+     * 如果当前书签列表中有待插入书签项的父目录项，
+     * 则将其插入到父目录项中，
+     * 如果父目录项不存在或无法插入到页面中时，
+     * 将其插入到根列表下。
      *
      * @param item {Object}
      *     书签项数据对象
      *
      * @param isCreatePath {Boolean}
-     *     当节点父对象不存在时，是否要创建其父节点，
-     *     若为 false，则会直接将该节点插入根列表下。
+     *     当父目录项不存在（或没有插入到页面中）时，是否要创建父目录项（或插入到页面中），
+     *     若为 false，则会直接将该节点插入到根列表下。
      */
     function insertItem(item, isCreatePath) {
         if (!item) { return; }
@@ -173,33 +223,51 @@ $(function() {
         var pId = item.data.parentId,
             pItem = bmItems[pId];
 
-        if (!pItem && isCreatePath) {
-            chrome.bookmarks.get(pId + '', function(nodes) {
-                var pNode = nodes && nodes[0];
+        if (isCreatePath) {
+            if (!pItem) {
+                chrome.bookmarks.get(pId + '', function(nodes) {
+                    var pNode = nodes && nodes[0];
 
-                if (pNode && simpleBookmarks.isCorrectNode(pNode)) {
-                    pItem = createBMItem(pNode);
-                    insertItem(item, isCreatePath);
-                }
+                    if (pNode && simpleBookmarks.isCorrectNode(pNode)) {
+                        pItem = createBMItem(pNode);
+                        insertItem(item, isCreatePath);
+                    }
 
+                    insert(item);
+                });
+            }
+            else if ( !$.contains(document.body, pItem.el[0]) ) {
+                insertItem(pItem, isCreatePath);
+                insertToSubList(pItem, item);
+            }
+            else {
                 insert();
-            });
+            }
         }
         else {
             insert();
         }
 
         function insert() {
-            if (pItem) {
-                if (!pItem.sublistEl) {
-                    createBMSubList(pItem);
-                }
-
-                pItem.sublistEl.append(item.el);
+            // 如果父目录项存在，且在页面中
+            if (pItem && $.contains(document.body, pItem.el[0])) {
+                insertToSubList(pItem, item);
             }
             else {
-                bmRootList.append(item.el);
+                insertToRootList(item);
             }
+        }
+
+        function insertToRootList(item) {
+            bmRootList.append(item.el);
+        }
+
+        function insertToSubList(parentItem, subItem) {
+            if (!parentItem.sublistEl) {
+                createBMSubList(parentItem);
+            }
+
+            parentItem.sublistEl.append(subItem.el);
         }
     }
 });

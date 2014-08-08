@@ -3,13 +3,18 @@ $fa-css-prefix: icon;
 @import "compass";
 @import "vendors/font-awesome/font-awesome";
 
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
 body {
     font: 12px/1.4285 arial,sans-serif;
     color: #333;
     margin: 0;
-    padding: 48px 8px 8px;
+    padding: 40px 0 0;
     width: 400px;
-    min-height: 300px;
 }
 
 a {
@@ -20,7 +25,7 @@ button, input, select {
     color: inherit;
 }
 
-.search-box {
+#search-box {
     position: fixed;
     top: 0;
     left: 0;
@@ -33,25 +38,6 @@ button, input, select {
     border-bottom: 1px solid #ddd;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
 
-    input[type=text] {
-        box-sizing: border-box;
-
-        width: 100%;
-        height: 22px;
-        padding: 0 7px 0 23px;
-
-        background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        color: #aaa;
-
-        &:focus {
-            outline: none;
-            border-color: #87A9C4;
-            color: inherit;
-        }
-    }
-
     .icon {
         width: 20px;
         height: 20px;
@@ -61,6 +47,23 @@ button, input, select {
         left: 9px;
         top: 9px;
         color: #87A9C4;
+    }
+}
+
+#search {
+    width: 100%;
+    height: 22px;
+    padding: 0 7px 0 23px;
+
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    color: #aaa;
+
+    &:focus {
+        outline: none;
+        border-color: #87A9C4;
+        color: inherit;
     }
 }
 
@@ -141,4 +144,10 @@ button, input, select {
             background: #e0e0e0;
         }
     }
+}
+
+#bookmarks {
+    height: 500px;
+    overflow-y: auto;
+    padding: 8px;
 }
