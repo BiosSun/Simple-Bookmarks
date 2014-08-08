@@ -2497,7 +2497,12 @@ a {
   padding-left: 2700px;
 }
 /* line 39, ../sass/main.scss */
-.bm-item-title:before {
+.bm-item-title:hover {
+  background: #e0e0e0;
+}
+
+/* line 44, ../sass/main.scss */
+.bm-item-favicon {
   display: inline-block;
   width: 20px;
   height: 20px;
@@ -2506,25 +2511,17 @@ a {
   overflow: hidden;
   text-align: center;
   vertical-align: middle;
-}
-/* line 53, ../sass/main.scss */
-.bm-item-title:hover {
-  background: #e0e0e0;
+  color: #87A9C4;
 }
 
-/* line 58, ../sass/main.scss */
-.bm-item-directory > .bm-item-title:before {
+/* line 60, ../sass/main.scss */
+.bm-item-directory > .bm-item-title > .bm-item-favicon:before {
   content: "\f07b";
 }
 
-/* line 62, ../sass/main.scss */
-.bm-item-directory.open > .bm-item-title:before {
+/* line 65, ../sass/main.scss */
+.bm-item-directory.open > .bm-item-title > .bm-item-favicon:before {
   content: "\f07c";
-}
-
-/* line 66, ../sass/main.scss */
-.bm-item-bookmark > .bm-item-title:before {
-  content: "\f15b";
 }
 
 /* line 70, ../sass/main.scss */

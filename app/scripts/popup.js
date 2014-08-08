@@ -52,9 +52,10 @@ $(function() {
     function createBMItem(node) {
         var itemEl = $('<li class="bm-item"></li>'),
             itemTitleEl = $('<a class="bm-item-title">' + node.title + '</a>'),
+            faviconEl = $('<i class="bm-item-favicon"></i>'),
             item;
 
-        itemEl.append(itemTitleEl);
+        itemEl.append(itemTitleEl.prepend(faviconEl));
 
         itemEl.attr({
             'id': 'bmitem-' + node.id,
@@ -67,6 +68,10 @@ $(function() {
         itemTitleEl.attr({
             href: node.url || 'javascript:'
         });
+
+        if (node.url) {
+            faviconEl.append('<img src="chrome://favicon/' + node.url + '">');
+        }
 
         item = {
             id: node.id,
