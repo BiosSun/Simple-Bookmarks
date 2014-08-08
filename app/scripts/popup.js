@@ -3,6 +3,9 @@ $(function() {
 
     var doc = $(document),
 
+        _rspace = /\s/g,
+        _rseparator = /[\s-]/g,
+
         bmRootList = $('#bookmarks'),
         bmItems = {};
 
@@ -72,29 +75,20 @@ $(function() {
         }
     }
 
-    // 创建一个书签节点
+    // 创建一个书签项
     function createBMItem(node) {
-        var itemEl = $('<li class="bm-item"></li>'),
-            itemTitleEl = $('<a class="bm-item-title">' + node.title + '</a>'),
-            faviconEl = $('<i class="bm-item-favicon"></i>'),
-            item;
+        var itemEl, item;
 
-        itemEl.append(itemTitleEl.prepend(faviconEl));
+        if (!node.title) { return null; }
 
-        itemEl.attr({
-            'id': 'bmitem-' + node.id,
-            'data-id': node.id,
-            'data-index': node.index
-        });
-
-        itemEl.addClass(node.children ? 'bm-item-directory' : 'bm-item-bookmark');
-
-        itemTitleEl.attr({
-            href: node.url || 'javascript:'
-        });
-
-        if (node.url) {
-            faviconEl.append('<img src="chrome://favicon/' + node.url + '">');
+        if (node.children) {
+            itemEl = createBMDirectoryItemEl(node);
+        }
+        else if (node.title.replace(_rspace, '').substring(0, 5) === '-----') {
+            itemEl = createBMSeparatorItemEl(node);
+        }
+        else if (node.url) {
+            itemEl = createBMBookmarkItemEl(node);
         }
 
         item = {
@@ -105,6 +99,48 @@ $(function() {
 
         bmItems[node.id] = item;
         return item;
+    }
+
+    function createBMDirectoryItemEl(node) {
+        return $(
+            '<li id="bmitem-' + node.id + '" class="bm-item bm-item-directory"' +
+                ' data-id="' + node.id + '"' +
+                ' data-index="' + node.index + '">' +
+                '<span class="bm-item-title">' +
+                    '<i class="bm-item-favicon"></i>' +
+                    node.title +
+                '</span>' +
+            '</li>'
+        );
+    }
+
+    function createBMBookmarkItemEl(node) {
+        return $(
+            '<li id="bmitem-' + node.id + '" class="bm-item bm-item-bookmark"' +
+                ' data-id="' + node.id + '"' +
+                ' data-index="' + node.index + '">' +
+                '<a class="bm-item-title" href="' + node.url + '">' +
+                    '<i class="bm-item-favicon">' +
+                        '<img src="chrome://favicon/' + node.url + '" />' +
+                    '</i>' +
+                    node.title +
+                '</a>' +
+            '</li>'
+        );
+    }
+
+    function createBMSeparatorItemEl(node) {
+        var title = node.title.replace(_rseparator, '');
+        return $(
+            '<li id="bmitem-' + node.id + '" class="bm-item bm-item-separator"' +
+                ' data-id="' + node.id + '"' +
+                ' data-index="' + node.index + '">' +
+                '<span class="bm-item-title">' +
+                    '<span class="line"></span>' +
+                    '<span class="text">' + title + '</span>' +
+                '</span>' +
+            '</li>'
+        );
     }
 
     // 创建一个书签子列表
@@ -132,6 +168,7 @@ $(function() {
      *     若为 false，则会直接将该节点插入根列表下。
      */
     function insertItem(item, isCreatePath) {
+        if (!item) { return; }
 
         var pId = item.data.parentId,
             pItem = bmItems[pId];

@@ -2495,13 +2495,14 @@ a {
   text-overflow: ellipsis;
   margin-left: -2700px;
   padding-left: 2700px;
+  cursor: pointer;
 }
-/* line 39, ../sass/main.scss */
+/* line 41, ../sass/main.scss */
 .bm-item-title:hover {
   background: #e0e0e0;
 }
 
-/* line 44, ../sass/main.scss */
+/* line 46, ../sass/main.scss */
 .bm-item-favicon {
   display: inline-block;
   width: 20px;
@@ -2514,17 +2515,39 @@ a {
   color: #87A9C4;
 }
 
-/* line 60, ../sass/main.scss */
+/* line 62, ../sass/main.scss */
 .bm-item-directory > .bm-item-title > .bm-item-favicon:before {
   content: "\f07b";
 }
 
-/* line 65, ../sass/main.scss */
+/* line 67, ../sass/main.scss */
 .bm-item-directory.open > .bm-item-title > .bm-item-favicon:before {
   content: "\f07c";
 }
 
-/* line 70, ../sass/main.scss */
+/* line 72, ../sass/main.scss */
+.bm-item-separator > .bm-item-title {
+  position: relative;
+}
+/* line 75, ../sass/main.scss */
+.bm-item-separator > .bm-item-title .line {
+  display: block;
+  margin: 9px 0 -10px;
+  border-bottom: 1px dashed #bbb;
+}
+/* line 81, ../sass/main.scss */
+.bm-item-separator > .bm-item-title .text {
+  margin-left: 20px;
+  padding: 0 5px;
+  color: #999;
+  background: #fff;
+}
+/* line 89, ../sass/main.scss */
+.bm-item-separator > .bm-item-title:hover .text {
+  background: #e0e0e0;
+}
+
+/* line 95, ../sass/main.scss */
 #bookmarks {
   width: 500px;
 }

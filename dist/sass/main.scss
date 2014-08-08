@@ -36,6 +36,8 @@ a {
     margin-left: -2700px;
     padding-left: 2700px;
 
+    cursor: pointer;
+
     &:hover {
         background: #e0e0e0;
     }
@@ -65,6 +67,29 @@ a {
 .bm-item-directory.open > .bm-item-title > .bm-item-favicon:before {
     // content: "\f115";
     content: "\f07c";
+}
+
+.bm-item-separator > .bm-item-title {
+    position: relative;
+
+    .line {
+        display: block;
+        margin: 9px 0 -10px;
+        border-bottom: 1px dashed #bbb;
+    }
+
+    .text {
+        margin-left: 20px;
+        padding: 0 5px;
+        color: #999;
+        background: #fff;
+    }
+
+    &:hover {
+        .text {
+            background: #e0e0e0;
+        }
+    }
 }
 
 #bookmarks {
