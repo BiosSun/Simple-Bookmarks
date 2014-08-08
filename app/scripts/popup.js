@@ -13,9 +13,33 @@ $(function() {
         }
     );
 
-    doc.on('click', '.bm-item-title', function() {
-        var itemEl = $(this).closest('.bm-item');
-        toggleBMItem(itemEl.attr('data-id'));
+    doc.on('click', '.bm-item-title', function(e) {
+        var itemEl = $(this).closest('.bm-item'),
+            item = bmItems[itemEl.attr('data-id')],
+
+            isCtrlMeta = e.ctrlKey || e.metaKey,
+            isShift = e.shiftKey,
+
+            url;
+
+        if (itemEl.hasClass('bm-item-directory')) {
+            toggleBMItem(item);
+        }
+        else if (itemEl.hasClass('bm-item-bookmark')) {
+            url = item.data.url;
+
+            if (isCtrlMeta) {
+                simpleBookmarks.openBookmarksNewTab(url, true);
+            }
+            else if (isShift) {
+                simpleBookmarks.openBookmarksNewWindow(url);
+            }
+            else {
+                simpleBookmarks.openBookmarkCurrentTab(url, true);
+            }
+        }
+
+        return false;
     });
 
     // 打开一个书签目录项
@@ -39,8 +63,7 @@ $(function() {
     // }
 
     // 打开一个书签目录项
-    function toggleBMItem(id) {
-        var item = bmItems[id];
+    function toggleBMItem(item) {
         if (item.sublistEl) {
             item.isOpen = !(item.isOpen);
             item.sublistEl.slideToggle();

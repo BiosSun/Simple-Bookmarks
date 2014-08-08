@@ -20,6 +20,9 @@
 
     "permissions": [
         "bookmarks",
-        "chrome://favicon/"
+        "chrome://favicon/",
+        "\u003Call_urls>",
+        "storage",
+        "tabs"
     ]
 }
