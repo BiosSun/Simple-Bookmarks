@@ -6,11 +6,49 @@ $fa-css-prefix: icon;
 body {
     font: 12px/1.4285 arial,sans-serif;
     color: #333;
-    margin: 0;
+    margin: 8px;
 }
 
 a {
     text-decoration: none;
+}
+
+button, input, select {
+    color: inherit;
+}
+
+.search-box {
+    margin-bottom: 10px;
+    position: relative;
+
+    input[type=text] {
+        box-sizing: border-box;
+
+        width: 100%;
+        height: 22px;
+        padding: 0 7px 0 23px;
+
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        color: #aaa;
+
+        &:focus {
+            outline: none;
+            border-color: #87A9C4;
+            color: inherit;
+        }
+    }
+
+    .icon {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        text-align: center;
+        position: absolute;
+        left: 1px;
+        top: 1px;
+        color: #87A9C4;
+    }
 }
 
 .bm-list, .bm-sublist {
