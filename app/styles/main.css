@@ -2493,8 +2493,10 @@ a {
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
+  margin-left: -2700px;
+  padding-left: 2700px;
 }
-/* line 36, ../sass/main.scss */
+/* line 39, ../sass/main.scss */
 .bm-item-title:before {
   display: inline-block;
   width: 20px;
@@ -2505,23 +2507,27 @@ a {
   text-align: center;
   vertical-align: middle;
 }
+/* line 53, ../sass/main.scss */
+.bm-item-title:hover {
+  background: #e0e0e0;
+}
 
-/* line 51, ../sass/main.scss */
+/* line 58, ../sass/main.scss */
 .bm-item-directory > .bm-item-title:before {
   content: "\f07b";
 }
 
-/* line 55, ../sass/main.scss */
+/* line 62, ../sass/main.scss */
 .bm-item-directory.open > .bm-item-title:before {
   content: "\f07c";
 }
 
-/* line 59, ../sass/main.scss */
+/* line 66, ../sass/main.scss */
 .bm-item-bookmark > .bm-item-title:before {
   content: "\f15b";
 }
 
-/* line 63, ../sass/main.scss */
+/* line 70, ../sass/main.scss */
 #bookmarks {
   width: 500px;
 }

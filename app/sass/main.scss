@@ -33,6 +33,9 @@ a {
 
     @include ellipsis;
 
+    margin-left: -2700px;
+    padding-left: 2700px;
+
     &:before {
         display: inline-block;
 
@@ -45,6 +48,10 @@ a {
         overflow: hidden;
         text-align: center;
         vertical-align: middle;
+    }
+
+    &:hover {
+        background: #e0e0e0;
     }
 }
 
