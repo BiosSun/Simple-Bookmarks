@@ -42,32 +42,33 @@ $(function() {
         return false;
     });
 
-    // 打开一个书签目录项
-    // function openBMItem(id) {
-    //     var item = bmItems[id];
-    //     if (item.sublistEl) {
-    //         item.isOpen = true;
-    //         item.sublistEl.slideDown();
-    //         item.el.addClass('open');
-    //     }
-    // }
+    // 切换一个书签目录项的打开与关闭状态
+    function toggleBMItem(item, sw) {
+        if (sw || !item.isOpen) {
+            openBMItem(item);
+        }
+        else {
+            closeBMItem(item);
+        }
+    }
 
     // 打开一个书签目录项
-    // function closeBMItem(id) {
-    //     var item = bmItems[id];
-    //     if (item.sublistEl) {
-    //         item.isOpen = false;
-    //         item.sublistEl.slideUp();
-    //         item.el.removeClass('open');
-    //     }
-    // }
+    function openBMItem(item) {
+        item.isOpen = true;
+        item.el.addClass('open');
 
-    // 打开一个书签目录项
-    function toggleBMItem(item) {
         if (item.sublistEl) {
-            item.isOpen = !(item.isOpen);
-            item.sublistEl.slideToggle();
-            item.el.toggleClass('open');
+            item.sublistEl.slideDown();
+        }
+    }
+
+    // 打开一个书签目录项
+    function closeBMItem(item) {
+        item.isOpen = false;
+        item.el.removeClass('open');
+
+        if (item.sublistEl) {
+            item.sublistEl.slideUp();
         }
     }
 
