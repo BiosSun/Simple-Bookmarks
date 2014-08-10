@@ -28,29 +28,59 @@ button, input, select {
     color: inherit;
 }
 
-#search-box {
+.btn {
+    background: #e0e0e0;
+    padding: 7px 14px;
+    border-radius: 3px;
+    border: 0;
+    cursor: pointer;
+
+    &:hover {
+        background: #bbb;
+    }
+
+    &:active {
+        box-shadow: inset 0 2px 3px rgba(0, 0, 0, .5);
+    }
+}
+
+.confirm-panel {
+    .button-bar {
+        text-align: right;
+    }
+}
+
+
+#fixed-top {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 100;
 
-    padding: 8px;
+    padding: 8px 8px 0;
     background: #fafafa;
 
     border-bottom: 1px solid #ddd;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
 
-    .icon {
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-        text-align: center;
-        position: absolute;
-        left: 9px;
-        top: 9px;
-        color: #87A9C4;
-    }
+    overflow: hidden;
+}
+
+.fixed-top-panel {
+    position: relative;
+    margin: 0 0 8px;
+}
+
+.search-panel .icon {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    position: absolute;
+    left: 1px;
+    top: 1px;
+    color: #87A9C4;
 }
 
 #search {

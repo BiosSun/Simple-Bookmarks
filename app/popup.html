@@ -6,9 +6,20 @@
         <link href="styles/main.css" rel="stylesheet"/>
     </head>
     <body>
-        <div id="search-box">
-            <input id="search" name="" type="text" placeholder="搜索书签" autofocus />
-            <i class="icon icon-search"></i>
+        <div id="fixed-top">
+            <div class="fixed-top-panel confirm-panel" style="display: none;">
+                <p>
+                    你确定要在新标签页中打开 27 个页面吗？
+                </p>
+                <div class="button-bar">
+                    <button type="button" class="btn confirm">确定</button>
+                    <button type="button" class="btn cancel">取消</button>
+                </div>
+            </div>
+            <div class="fixed-top-panel search-panel">
+                <input id="search" name="" type="text" placeholder="搜索书签" autofocus />
+                <i class="icon icon-search"></i>
+            </div>
         </div>
         <ul id="bookmarks" class="bm-list">
         </ul>

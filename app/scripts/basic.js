@@ -3,6 +3,8 @@
 
     var
 
+    _rspace = /\s/g,
+
     storageData,
 
     B = {
@@ -17,8 +19,9 @@
                 });
             });
         },
+
         // 在当前标签页中打开页面
-        openBookmarkCurrentTab: function(url, isClose){
+        openUrlInCurrentTab: function(url, isClose){
             chrome.tabs.getSelected(null, function(tab){
                 chrome.tabs.update(tab.id, {
                     url: url
@@ -29,18 +32,31 @@
         },
 
         // 在新的标签页中打开页面
-        openBookmarksNewTab: function(url, isClose) {
-            chrome.tabs.getSelected(null, function() {
-                chrome.tabs.create({
-                    url: url
+        openUrlInNewTab: function(url, isClose) {
+            if (typeof url === 'string') {
+                basic(function() {
+                    chrome.tabs.create({ url: url });
                 });
+            }
+            // is array
+            else {
+                basic(function() {
+                    for (var i = 0, l = url.length; i < l; i++) {
+                        chrome.tabs.create({ url: url[i] });
+                    }
+                });
+            }
 
-                if (isClose) { setTimeout(window.close, 200); }
-            });
+            function basic(callback) {
+                chrome.tabs.getSelected(null, function() {
+                    callback();
+                    if (isClose) { setTimeout(window.close, 200); }
+                });
+            }
         },
 
         // 在新的窗口中打开页面
-        openBookmarksNewWindow: function(url, isIncognito) {
+        openUrlInNewWindow: function(url, isIncognito) {
             chrome.windows.create({
                 url: url,
                 incognito: isIncognito
@@ -73,6 +89,26 @@
             }
         },
 
+        isSeparatorBookmark: function(node) {
+            return node.title.replace(_rspace, '').substring(0, 5) === '-----';
+        },
+
+        // 获取指定书签目录下所有子书签的 url
+        getChildrenUrls: function(id, callback) {
+            chrome.bookmarks.getChildren(id, function(nodes) {
+                var urls = [], node;
+
+                for (var i = 0, l = nodes.length; i < l; i++) {
+                    node = nodes[i];
+                    if (node.url && !B.isSeparatorBookmark(node)) {
+                        urls.push(node.url);
+                    }
+                }
+
+                callback(urls);
+            });
+        },
+
         // 判断所传入的节点是否有效
         isCorrectNode: function(node) {
             return !!node.title;
@@ -102,6 +138,42 @@
 
             // default result undefined
             return undefined;
+        },
+
+        // 显示顶部查询面板，同时隐藏在显示的其它面板
+        showSearchPanel: function() {
+            var fixedTop    = $('#fixed-top'),
+                searchPanel = fixedTop.find('> .search-panel'),
+                showPanel   = fixedTop.find('> .fixed-top-panel:visible');
+
+            searchPanel.slideDown(200);
+            showPanel.slideUp(200);
+        },
+
+        // 隐藏顶部查询面板，同时显示一个其它面板
+        hideSearchPanel: function(showPanel) {
+            var fixedTop    = $('#fixed-top'),
+                searchPanel = fixedTop.find('> .search-panel');
+
+            searchPanel.slideUp(200);
+            showPanel.slideDown(200);
+        },
+
+        // 显示一个确认提示
+        confirm: function(message, callback) {
+            var confirmPanel = $('#fixed-top .confirm-panel');
+
+            confirmPanel.find('> p').text(message);
+
+            confirmPanel.off('click.confirm');
+            confirmPanel.on('click.confirm', '.confirm', callback);
+            confirmPanel.on('click.confirm', '.cancel', function() {
+                B.showSearchPanel();
+            });
+
+            B.hideSearchPanel(confirmPanel);
+
+            confirmPanel.find('.confirm')[0].focus();
         }
     };
 

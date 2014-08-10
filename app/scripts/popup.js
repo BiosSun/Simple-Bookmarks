@@ -7,7 +7,6 @@
 
         STORAGE_KEY_IS_OPEN = '1',
 
-        _rspace = /\s/g,
         _rseparator = /[\s-]/g,
 
         bmRootList = $('#bookmarks'),
@@ -48,13 +47,13 @@
                 url = item.data.url;
 
                 if (isCtrlMeta) {
-                    B.openBookmarksNewTab(url, true);
+                    B.openUrlInNewTab(url, true);
                 }
                 else if (isShift) {
-                    B.openBookmarksNewWindow(url);
+                    B.openUrlInNewWindow(url);
                 }
                 else {
-                    B.openBookmarkCurrentTab(url, true);
+                    B.openUrlInCurrentTab(url, true);
                 }
             }
 
@@ -70,10 +69,7 @@
         // 绑定右键菜单
         $.contextMenu({
             selector: '.bm-item-bookmark .bm-item-title',
-            callback: function(key, options) {
-                console.info(key, options);
-                contextMenuHandler(key, options);
-            },
+            callback: contextMenuHandler,
             items: {
                 open: { name: '打开书签' },
                 openInNewTab : { name: '在新标签页中打开书签' },
@@ -86,10 +82,7 @@
         });
         $.contextMenu({
             selector: '.bm-item-separator .bm-item-title',
-            callback: function(key, options) {
-                console.info(key, options);
-                contextMenuHandler(key, options);
-            },
+            callback: contextMenuHandler,
             items: {
                 edit : { name: '编辑' },
                 delete : { name: '删除' }
@@ -97,10 +90,7 @@
         });
         $.contextMenu({
             selector: '.bm-item-directory .bm-item-title',
-            callback: function(key, options) {
-                console.info(key, options);
-                contextMenuHandler(key, options);
-            },
+            callback: contextMenuHandler,
             items: {
                 openAllInNewTab : { name: '在新标签页中打开全部书签' },
                 openAllInNewWindow : { name: '在新窗口中打开全部书签' },
@@ -118,20 +108,39 @@
 
         switch(key) {
             case 'open' :
-                B.openBookmarkCurrentTab(item.data.url, true);
+                B.openUrlInCurrentTab(item.data.url, true);
                 break;
             case 'openInNewTab' :
-                B.openBookmarksNewTab(item.data.url, true);
+                B.openUrlInNewTab(item.data.url, true);
                 break;
             case 'openInNewWindow' :
-                B.openBookmarksNewWindow(item.data.url);
+                B.openUrlInNewWindow(item.data.url);
                 break;
             case 'openInStealthWindow' :
-                B.openBookmarksNewWindow(item.data.url, true);
+                B.openUrlInNewWindow(item.data.url, true);
+                break;
+            case 'openAllInNewTab' :
+                openChildrens(item.id, '新标签页', function(urls) { B.openUrlInNewTab(urls, true); });
+                break;
+            case 'openAllInNewWindow' :
+                openChildrens(item.id, '新窗口', function(urls) { B.openUrlInNewWindow(urls); });
+                break;
+            case 'openAllInStealthWindow' :
+                openChildrens(item.id, '隐身窗口', function(urls) { B.openUrlInNewWindow(urls, true); });
                 break;
         }
     }
 
+    // 使用某种方式打开指定的书签目录内的所有子书签
+    function openChildrens(id, openMode, openOperation) {
+        B.getChildrenUrls(id, function(urls) {
+            if (urls.length > 0) {
+                B.confirm('你确定要在' + openMode + '中打开这 ' + urls.length + ' 个页面吗？', function() {
+                    openOperation(urls);
+                });
+            }
+        });
+    }
 
     // 根据一个字符串查询书签项
     function searchItems(searchText) {
@@ -233,7 +242,7 @@
             // bookmark
             if (node.url) {
                 // separator bookmark
-                if (node.title.replace(_rspace, '').substring(0, 5) === '-----') {
+                if (B.isSeparatorBookmark(node)) {
                     item.el = createBMSeparatorItemEl(node);
                     item.type = BM_ITEM_TYPE_SEPARATOR;
                 }
