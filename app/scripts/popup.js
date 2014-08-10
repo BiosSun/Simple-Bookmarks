@@ -7,6 +7,8 @@ $(function() {
         BM_ITEM_TYPE_BOOKMARK = 2,
         BM_ITEM_TYPE_SEPARATOR = 3,
 
+        STORAGE_KEY_IS_OPEN = '1',
+
         _rspace = /\s/g,
         _rseparator = /[\s-]/g,
 
@@ -19,8 +21,9 @@ $(function() {
 
     simpleBookmarks.traversalBookmarks(
         function(node) {
-            var item = createBMItem(node);
-            insertItem(item, true);
+            createBMItem(node, function(item) {
+                insertItem(item, true);
+            });
         }
     );
 
@@ -104,6 +107,10 @@ $(function() {
         if (item.sublistEl) {
             item.sublistEl.slideDown();
         }
+
+        var storage = {};
+        storage[item.id + '-' + STORAGE_KEY_IS_OPEN] = true;
+        chrome.storage.local.set(storage);
     }
 
     // 打开一个书签目录项
@@ -114,16 +121,19 @@ $(function() {
         if (item.sublistEl) {
             item.sublistEl.slideUp();
         }
+
+        chrome.storage.local.remove(item.id + '-' + STORAGE_KEY_IS_OPEN);
     }
 
     /**
      * 创建并注册一个书签项
      */
-    function createBMItem(node) {
+    function createBMItem(node, collback) {
         var item = {
             id: node.id,
             data: node
-        };
+        },
+            isOpenKey = item.id + '-' + STORAGE_KEY_IS_OPEN;
 
         if (!node.title) { return null; }
 
@@ -144,7 +154,10 @@ $(function() {
         bmItems[node.id] = item;
         bmItems.allItems.push(item);
 
-        return item;
+        chrome.storage.local.get(isOpenKey, function(items) {
+            item.isOpen = items[isOpenKey];
+            collback(item);
+        });
     }
 
     function createBMDirectoryItemEl(node) {
@@ -229,11 +242,14 @@ $(function() {
                     var pNode = nodes && nodes[0];
 
                     if (pNode && simpleBookmarks.isCorrectNode(pNode)) {
-                        pItem = createBMItem(pNode);
-                        insertItem(item, isCreatePath);
+                        pItem = createBMItem(pNode, function(pItem) {
+                            insertItem(pItem, isCreatePath);
+                            insert(item);
+                        });
                     }
-
-                    insert(item);
+                    else {
+                        insert(item);
+                    }
                 });
             }
             else if ( !$.contains(document.body, pItem.el[0]) ) {
