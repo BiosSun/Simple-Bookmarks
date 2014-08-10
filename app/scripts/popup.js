@@ -115,6 +115,21 @@
     // 处理右键菜单点击事件
     function contextMenuHandler(key, options) {
         var item = bmItems[options.$trigger.closest('.bm-item').attr('data-id')];
+
+        switch(key) {
+            case 'open' :
+                B.openBookmarkCurrentTab(item.data.url, true);
+                break;
+            case 'openInNewTab' :
+                B.openBookmarksNewTab(item.data.url, true);
+                break;
+            case 'openInNewWindow' :
+                B.openBookmarksNewWindow(item.data.url);
+                break;
+            case 'openInStealthWindow' :
+                B.openBookmarksNewWindow(item.data.url, true);
+                break;
+        }
     }
 
 
