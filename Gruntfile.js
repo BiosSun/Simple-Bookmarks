@@ -54,7 +54,7 @@ module.exports = function (grunt) {
                 files: [{
                     dot: true,
                     src: [
-                        '<%= config.dist %>'
+                        'dist'
                     ]
                 }]
             }
@@ -63,7 +63,7 @@ module.exports = function (grunt) {
         mkdir: {
             dist: {
                 options: {
-                    create: ['<%= config.dist %>']
+                    create: ['dist']
                 }
             }
         },
@@ -76,8 +76,8 @@ module.exports = function (grunt) {
             },
             all: [
                 'Gruntfile.js',
-                '<%= config.appJS %>/**/*.js',
-                '!<%= config.appJS %>/vendors/**/*',
+                'app/scripts/**/*.js',
+                '!app/scripts/vendors/**/*',
                 'test/spec/**/*.js'
             ]
         },
@@ -87,15 +87,15 @@ module.exports = function (grunt) {
             src: {
                 options: {
                     httpPath: '',
-                    cssDir: '<%= config.appCSS %>',
-                    sassDir: '<%= config.appSASS %>',
-                    imageDir: '<%= config.appImages %>',
-                    javascriptsDir: '<%= config.appJS %>',
-                    fontsDir: '<%= config.appFonts %>',
-                    httpStylesheetsPath: '<%= config.httpCSS %>',
-                    httpImagesPath: '<%= config.httpImages %>',
-                    httpJavascriptsPath: '<%= config.httpJS %>',
-                    httpFontsPath: '<%= config.httpFonts %>'
+                    cssDir: 'app/styles',
+                    sassDir: 'app/sass',
+                    imageDir: 'app/images',
+                    javascriptsDir: 'app/scripts',
+                    fontsDir: 'app/fonts',
+                    httpStylesheetsPath: 'styles',
+                    httpImagesPath: 'images',
+                    httpJavascriptsPath: 'scripts',
+                    httpFontsPath: 'fonts'
                 }
             }
         },
@@ -108,9 +108,9 @@ module.exports = function (grunt) {
             src: {
                 files: [{
                     expand: true,
-                    cwd: '<%= config.appCSS %>',
+                    cwd: 'app/styles',
                     src: '**/*.css',
-                    dest: '<%= config.appCSS %>'
+                    dest: 'app/styles'
                 }]
             }
         },
@@ -120,9 +120,9 @@ module.exports = function (grunt) {
             dist: {
                 files: [{
                     expand: true,
-                    cwd: '<%= config.distImages %>',
+                    cwd: 'dist/images',
                     src: '**/*.{gif,jpeg,jpg,png}',
-                    dest: '<%= config.distImages %>'
+                    dest: 'dist/images'
                 }]
             }
         },
@@ -130,9 +130,9 @@ module.exports = function (grunt) {
         cssmin: {
             dist: {
                 expand: true,
-                cwd: '<%= config.distCSS %>',
+                cwd: 'dist/styles',
                 src: ['**/*.css'],
-                dest: '<%= config.distCSS %>'
+                dest: 'dist/styles'
             }
         },
 
@@ -140,9 +140,9 @@ module.exports = function (grunt) {
             dist: {
                 files: [{
                     expand: true,
-                    cwd: '<%= config.distJS %>',
+                    cwd: 'dist/scripts',
                     src: ['**/*.js'],
-                    dest: '<%= config.distJS %>'
+                    dest: 'dist/scripts'
                 }]
             }
         },
@@ -151,16 +151,16 @@ module.exports = function (grunt) {
         copy: {
             dist: {
                 expand: true,
-                cwd: '<%= config.app %>/',
+                cwd: 'app/',
                 src: '**/*',
-                dest: '<%= config.dist %>/'
+                dest: 'dist/'
             }
         },
 
         bower: {
             install: {
                 options: {
-                    targetDir: '<%= config.appJS %>/vendors',
+                    targetDir: 'app/scripts/vendors',
                     cleanTargetDir: true,
                     layout: 'byComponent'
                 }
@@ -180,13 +180,13 @@ module.exports = function (grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: '<%= config.dist %>/',
+                        cwd: 'dist/',
                         src: [
                             '**/*',
                             '!**/vendors/**/*',
                             '!{images,fonts}/**/*'
                         ],
-                        dest: '<%= config.dist %>/'
+                        dest: 'dist/'
                     }
                 ]
             }
@@ -202,15 +202,15 @@ module.exports = function (grunt) {
                 tasks: ['bower', 'copy', 'replace']
             },
             scripts: {
-                files: ['<%= config.appJS %>/**/*.js'],
+                files: ['app/scripts/**/*.js'],
                 tasks: ['jshint', 'copy', 'replace']
             },
             scss: {
-                files: ['<%= config.appSASS %>/**/*.{scss,sass}'],
+                files: ['app/sass/**/*.{scss,sass}'],
                 tasks: ['compass', 'autoprefixer', 'copy', 'replace']
             },
             file: {
-                files: ['<%= config.app %>/*.{html,json}'],
+                files: ['app/*.{html,json}'],
                 tasks: ['copy', 'replace']
             }
         }
