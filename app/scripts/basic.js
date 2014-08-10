@@ -1,7 +1,20 @@
 (function() {
     'use strict';
 
-    var simpleBookmarks = {
+    var
+
+    storageData,
+
+    B = {
+        init: function(callback) {
+            chrome.storage.local.get(function(items) {
+                storageData = items;
+
+                $(function() {
+                    callback();
+                });
+            });
+        },
         // 在当前标签页中打开页面
         openBookmarkCurrentTab: function(url, isClose){
             chrome.tabs.getSelected(null, function(tab){
@@ -36,11 +49,11 @@
             chrome.bookmarks.getTree(function(results) {
                 if ($.isArray(results)) {
                     $.each(results, function(i, node) {
-                        simpleBookmarks._traversalBookmarkNode(node, nodefc);
+                        B._traversalBookmarkNode(node, nodefc);
                     });
                 }
                 else {
-                    simpleBookmarks._traversalBookmarkNode(results, nodefc);
+                    B._traversalBookmarkNode(results, nodefc);
                 }
             });
         },
@@ -52,7 +65,7 @@
 
             if (node.children) {
                 $.each(node.children, function(i, node) {
-                    simpleBookmarks._traversalBookmarkNode(node, callback);
+                    B._traversalBookmarkNode(node, callback);
                 });
             }
         },
@@ -60,9 +73,35 @@
         // 判断所传入的节点是否有效
         isCorrectNode: function(node) {
             return !!node.title;
+        },
+
+        // 一个简单的本地存储接口
+        storage: function(key, val) {
+            var setObj;
+
+            // get
+            if (arguments.length === 1) {
+                return storageData[key];
+            }
+            // remove
+            else if (val === undefined) {
+                delete storageData[key];
+                chrome.storage.local.remove(key);
+            }
+            // set
+            else {
+                storageData[key] = val;
+
+                setObj = {};
+                setObj[key] = val;
+                chrome.storage.local.set(setObj);
+            }
+
+            // default result undefined
+            return undefined;
         }
     };
 
-    window.simpleBookmarks = simpleBookmarks;
+    window.simpleBookmarks = B;
 
 })();

@@ -1,9 +1,7 @@
-$(function() {
+(function($, B) {
     'use strict';
 
-    var doc = $(document),
-
-        BM_ITEM_TYPE_DIRECTORY = 1,
+    var BM_ITEM_TYPE_DIRECTORY = 1,
         BM_ITEM_TYPE_BOOKMARK = 2,
         BM_ITEM_TYPE_SEPARATOR = 3,
 
@@ -19,47 +17,52 @@ $(function() {
             allBookmarkItems: []
         };
 
-    simpleBookmarks.traversalBookmarks(
-        function(node) {
-            createBMItem(node, function(item) {
+    B.init(function() {
+        // 构建默认书签列表
+        B.traversalBookmarks(
+            function(node) {
+                var item = createBMItem(node);
                 insertItem(item, true);
-            });
-        }
-    );
-
-    doc.on('click', '.bm-item-title', function(e) {
-        var itemEl = $(this).closest('.bm-item'),
-            item = bmItems[itemEl.attr('data-id')],
-
-            isCtrlMeta = e.ctrlKey || e.metaKey,
-            isShift = e.shiftKey,
-
-            url;
-
-        if (itemEl.hasClass('bm-item-directory')) {
-            toggleBMItem(item);
-        }
-        else if (itemEl.hasClass('bm-item-bookmark')) {
-            url = item.data.url;
-
-            if (isCtrlMeta) {
-                simpleBookmarks.openBookmarksNewTab(url, true);
             }
-            else if (isShift) {
-                simpleBookmarks.openBookmarksNewWindow(url);
-            }
-            else {
-                simpleBookmarks.openBookmarkCurrentTab(url, true);
-            }
-        }
+        );
 
-        return false;
+        // 绑定书签项的点击事件
+        bmRootList.on('click', '.bm-item-title', function(e) {
+            var itemEl = $(this).closest('.bm-item'),
+                item = bmItems[itemEl.attr('data-id')],
+
+                isCtrlMeta = e.ctrlKey || e.metaKey,
+                isShift = e.shiftKey,
+
+                url;
+
+            if (itemEl.hasClass('bm-item-directory')) {
+                toggleBMItem(item);
+            }
+            else if (itemEl.hasClass('bm-item-bookmark')) {
+                url = item.data.url;
+
+                if (isCtrlMeta) {
+                    B.openBookmarksNewTab(url, true);
+                }
+                else if (isShift) {
+                    B.openBookmarksNewWindow(url);
+                }
+                else {
+                    B.openBookmarkCurrentTab(url, true);
+                }
+            }
+
+            return false;
+        });
+
+        // 绑定即时搜索相关事件
+        searchInput.on('keyup', function() {
+            var input = $(this);
+            searchItems(input.val());
+        });
     });
 
-    searchInput.on('keyup', function() {
-        var input = $(this);
-        searchItems(input.val());
-    });
 
     // 根据一个字符串查询书签项
     function searchItems(searchText) {
@@ -108,9 +111,9 @@ $(function() {
             item.sublistEl.slideDown();
         }
 
-        var storage = {};
-        storage[item.id + '-' + STORAGE_KEY_IS_OPEN] = true;
-        chrome.storage.local.set(storage);
+        B.storage(
+            item.id + '-' + STORAGE_KEY_IS_OPEN,
+            true);
     }
 
     // 打开一个书签目录项
@@ -122,18 +125,20 @@ $(function() {
             item.sublistEl.slideUp();
         }
 
-        chrome.storage.local.remove(item.id + '-' + STORAGE_KEY_IS_OPEN);
+        B.storage(
+            item.id + '-' + STORAGE_KEY_IS_OPEN,
+            undefined);
     }
 
     /**
      * 创建并注册一个书签项
      */
-    function createBMItem(node, collback) {
+    function createBMItem(node) {
         var item = {
-            id: node.id,
-            data: node
-        },
-            isOpenKey = item.id + '-' + STORAGE_KEY_IS_OPEN;
+                id: node.id,
+                data: node,
+                isOpen: B.storage(node.id + '-' + STORAGE_KEY_IS_OPEN)
+            };
 
         if (!node.title) { return null; }
 
@@ -154,10 +159,7 @@ $(function() {
         bmItems[node.id] = item;
         bmItems.allItems.push(item);
 
-        chrome.storage.local.get(isOpenKey, function(items) {
-            item.isOpen = items[isOpenKey];
-            collback(item);
-        });
+        return item;
     }
 
     function createBMDirectoryItemEl(node) {
@@ -241,15 +243,12 @@ $(function() {
                 chrome.bookmarks.get(pId + '', function(nodes) {
                     var pNode = nodes && nodes[0];
 
-                    if (pNode && simpleBookmarks.isCorrectNode(pNode)) {
-                        pItem = createBMItem(pNode, function(pItem) {
-                            insertItem(pItem, isCreatePath);
-                            insert(item);
-                        });
+                    if (pNode && B.isCorrectNode(pNode)) {
+                        pItem = createBMItem(pNode);
+                        insertItem(pItem, isCreatePath);
                     }
-                    else {
-                        insert(item);
-                    }
+
+                    insert(item);
                 });
             }
             else if ( !$.contains(document.body, pItem.el[0]) ) {
@@ -286,4 +285,4 @@ $(function() {
             parentItem.sublistEl.append(subItem.el);
         }
     }
-});
+})(jQuery, simpleBookmarks);
