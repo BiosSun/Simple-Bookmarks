@@ -66,7 +66,56 @@
             var input = $(this);
             searchItems(input.val());
         });
+
+        // 绑定右键菜单
+        $.contextMenu({
+            selector: '.bm-item-bookmark .bm-item-title',
+            callback: function(key, options) {
+                console.info(key, options);
+                contextMenuHandler(key, options);
+            },
+            items: {
+                open: { name: '打开书签' },
+                openInNewTab : { name: '在新标签页中打开书签' },
+                openInNewWindow : { name: '在新窗口中打开书签' },
+                openInStealthWindow : { name: '在隐身窗口中打开书签' },
+                sep1 : '----------',
+                edit : { name: '编辑' },
+                delete : { name: '删除' }
+            }
+        });
+        $.contextMenu({
+            selector: '.bm-item-separator .bm-item-title',
+            callback: function(key, options) {
+                console.info(key, options);
+                contextMenuHandler(key, options);
+            },
+            items: {
+                edit : { name: '编辑' },
+                delete : { name: '删除' }
+            }
+        });
+        $.contextMenu({
+            selector: '.bm-item-directory .bm-item-title',
+            callback: function(key, options) {
+                console.info(key, options);
+                contextMenuHandler(key, options);
+            },
+            items: {
+                openAllInNewTab : { name: '在新标签页中打开全部书签' },
+                openAllInNewWindow : { name: '在新窗口中打开全部书签' },
+                openAllInStealthWindow : { name: '在隐身窗口中打开全部书签' },
+                sep1 : '----------',
+                edit : { name: '编辑' },
+                delete : { name: '删除' }
+            }
+        });
     });
+
+    // 处理右键菜单点击事件
+    function contextMenuHandler(key, options) {
+        var item = bmItems[options.$trigger.closest('.bm-item').attr('data-id')];
+    }
 
 
     // 根据一个字符串查询书签项

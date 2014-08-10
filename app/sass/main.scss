@@ -1,7 +1,10 @@
 $fa-css-prefix: icon;
 
-@import "compass";
 @import "vendors/font-awesome/font-awesome";
+
+@import "compass";
+
+@import "jquery.contextMenu";
 
 *,
 *:before,
@@ -78,12 +81,18 @@ button, input, select {
 }
 
 .bm-item {
+    &.selected {
+        .bm-item-title {
+            background: #e0e0e0;
+        }
+    }
 }
 
 .bm-item-title {
     display: block;
     color: #333;
-    line-height: 20px;
+    height: 22px;
+    line-height: 22px;
 
     @include ellipsis;
 
@@ -92,7 +101,7 @@ button, input, select {
 
     cursor: pointer;
 
-    &:hover {
+    &:hover, &.context-menu-active {
         background: #e0e0e0;
     }
 }
@@ -100,11 +109,11 @@ button, input, select {
 .bm-item-favicon {
     display: inline-block;
 
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     margin: 0 5px 0 0;
 
-    font: 16px/20px FontAwesome;
+    font: 16px/22px FontAwesome;
 
     overflow: hidden;
     text-align: center;
@@ -139,7 +148,7 @@ button, input, select {
         background: #fff;
     }
 
-    &:hover {
+    &:hover, &.context-menu-active {
         .text {
             background: #e0e0e0;
         }

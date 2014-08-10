@@ -2459,14 +2459,142 @@
   content: "";
 }
 
-/* line 6, ../sass/main.scss */
+/* line 4, ../sass/jquery.contextMenu.scss */
+.context-menu-list {
+  margin: 0;
+  padding: 0;
+  min-width: 120px;
+  max-width: 250px;
+  display: inline-block;
+  position: absolute;
+  list-style-type: none;
+  border: 1px solid #DDD;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: 11px;
+}
+
+/* line 21, ../sass/jquery.contextMenu.scss */
+.context-menu-item {
+  padding: 4px 10px 4px 24px;
+  position: relative;
+}
+
+/* line 26, ../sass/jquery.contextMenu.scss */
+.context-menu-separator {
+  padding: 0;
+  border-bottom: 1px solid #DDD;
+}
+
+/* line 31, ../sass/jquery.contextMenu.scss */
+.context-menu-item > label > input,
+.context-menu-item > label > textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* line 39, ../sass/jquery.contextMenu.scss */
+.context-menu-item.hover {
+  cursor: pointer;
+  background-color: #e0e0e0;
+}
+
+/* line 44, ../sass/jquery.contextMenu.scss */
+.context-menu-item.disabled {
+  color: #666;
+}
+
+/* line 48, ../sass/jquery.contextMenu.scss */
+.context-menu-input.hover,
+.context-menu-item.disabled.hover {
+  cursor: default;
+  background-color: #EEE;
+}
+
+/* line 54, ../sass/jquery.contextMenu.scss */
+.context-menu-submenu:after {
+  content: ">";
+  color: #666;
+  position: absolute;
+  top: 0;
+  right: 3px;
+  z-index: 1;
+}
+
+/* icons
+    #protip:
+    In case you want to use sprites for icons (which I would suggest you do) have a look at
+    http://css-tricks.com/13224-pseudo-spriting/ to get an idea of how to implement
+    .context-menu-item.icon:before {}
+ */
+/* line 69, ../sass/jquery.contextMenu.scss */
+.context-menu-item.icon {
+  min-height: 18px;
+  background-repeat: no-repeat;
+  background-position: 4px 2px;
+}
+
+/* vertically align inside labels */
+/* line 73, ../sass/jquery.contextMenu.scss */
+.context-menu-input > label > * {
+  vertical-align: top;
+}
+
+/* position checkboxes and radios as icons */
+/* line 76, ../sass/jquery.contextMenu.scss */
+.context-menu-input > label > input[type="checkbox"],
+.context-menu-input > label > input[type="radio"] {
+  margin-left: -17px;
+}
+
+/* line 80, ../sass/jquery.contextMenu.scss */
+.context-menu-input > label > span {
+  margin-left: 5px;
+}
+
+/* line 84, ../sass/jquery.contextMenu.scss */
+.context-menu-input > label,
+.context-menu-input > label > input[type="text"],
+.context-menu-input > label > textarea,
+.context-menu-input > label > select {
+  display: block;
+  width: 100%;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* line 98, ../sass/jquery.contextMenu.scss */
+.context-menu-input > label > textarea {
+  height: 100px;
+}
+
+/* line 101, ../sass/jquery.contextMenu.scss */
+.context-menu-item > .context-menu-list {
+  display: none;
+  /* re-positioned by js */
+  right: -5px;
+  top: 5px;
+}
+
+/* line 108, ../sass/jquery.contextMenu.scss */
+.context-menu-item.hover > .context-menu-list {
+  display: block;
+}
+
+/* line 112, ../sass/jquery.contextMenu.scss */
+.context-menu-accesskey {
+  text-decoration: underline;
+}
+
+/* line 9, ../sass/main.scss */
 *,
 *:before,
 *:after {
   box-sizing: border-box;
 }
 
-/* line 12, ../sass/main.scss */
+/* line 15, ../sass/main.scss */
 body {
   font: 12px/1.4285 arial,sans-serif;
   color: #333;
@@ -2475,17 +2603,17 @@ body {
   width: 400px;
 }
 
-/* line 20, ../sass/main.scss */
+/* line 23, ../sass/main.scss */
 a {
   text-decoration: none;
 }
 
-/* line 24, ../sass/main.scss */
+/* line 27, ../sass/main.scss */
 button, input, select {
   color: inherit;
 }
 
-/* line 28, ../sass/main.scss */
+/* line 31, ../sass/main.scss */
 #search-box {
   position: fixed;
   top: 0;
@@ -2497,7 +2625,7 @@ button, input, select {
   border-bottom: 1px solid #ddd;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
-/* line 41, ../sass/main.scss */
+/* line 44, ../sass/main.scss */
 #search-box .icon {
   width: 20px;
   height: 20px;
@@ -2509,7 +2637,7 @@ button, input, select {
   color: #87A9C4;
 }
 
-/* line 53, ../sass/main.scss */
+/* line 56, ../sass/main.scss */
 #search {
   width: 100%;
   height: 22px;
@@ -2519,30 +2647,36 @@ button, input, select {
   border-radius: 3px;
   color: #aaa;
 }
-/* line 63, ../sass/main.scss */
+/* line 66, ../sass/main.scss */
 #search:focus {
   outline: none;
   border-color: #87A9C4;
   color: inherit;
 }
 
-/* line 70, ../sass/main.scss */
+/* line 73, ../sass/main.scss */
 .bm-list, .bm-sublist {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-/* line 76, ../sass/main.scss */
+/* line 79, ../sass/main.scss */
 .bm-sublist {
   margin-left: 25px;
 }
 
-/* line 83, ../sass/main.scss */
+/* line 85, ../sass/main.scss */
+.bm-item.selected .bm-item-title {
+  background: #e0e0e0;
+}
+
+/* line 91, ../sass/main.scss */
 .bm-item-title {
   display: block;
   color: #333;
-  line-height: 20px;
+  height: 22px;
+  line-height: 22px;
   white-space: nowrap;
   overflow: hidden;
   -ms-text-overflow: ellipsis;
@@ -2552,57 +2686,57 @@ button, input, select {
   padding-left: 2700px;
   cursor: pointer;
 }
-/* line 95, ../sass/main.scss */
-.bm-item-title:hover {
+/* line 104, ../sass/main.scss */
+.bm-item-title:hover, .bm-item-title.context-menu-active {
   background: #e0e0e0;
 }
 
-/* line 100, ../sass/main.scss */
+/* line 109, ../sass/main.scss */
 .bm-item-favicon {
   display: inline-block;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   margin: 0 5px 0 0;
-  font: 16px/20px FontAwesome;
+  font: 16px/22px FontAwesome;
   overflow: hidden;
   text-align: center;
   vertical-align: middle;
   color: #87A9C4;
 }
 
-/* line 116, ../sass/main.scss */
+/* line 125, ../sass/main.scss */
 .bm-item-directory > .bm-item-title > .bm-item-favicon:before {
   content: "\f07b";
 }
 
-/* line 121, ../sass/main.scss */
+/* line 130, ../sass/main.scss */
 .bm-item-directory.open > .bm-item-title > .bm-item-favicon:before {
   content: "\f07c";
 }
 
-/* line 126, ../sass/main.scss */
+/* line 135, ../sass/main.scss */
 .bm-item-separator > .bm-item-title {
   position: relative;
 }
-/* line 129, ../sass/main.scss */
+/* line 138, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .line {
   display: block;
   margin: 9px 0 -10px;
   border-bottom: 1px dashed #bbb;
 }
-/* line 135, ../sass/main.scss */
+/* line 144, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .text {
   margin-left: 20px;
   padding: 0 5px;
   color: #999;
   background: #fff;
 }
-/* line 143, ../sass/main.scss */
-.bm-item-separator > .bm-item-title:hover .text {
+/* line 152, ../sass/main.scss */
+.bm-item-separator > .bm-item-title:hover .text, .bm-item-separator > .bm-item-title.context-menu-active .text {
   background: #e0e0e0;
 }
 
-/* line 149, ../sass/main.scss */
+/* line 158, ../sass/main.scss */
 #bookmarks {
   height: 500px;
   overflow-y: auto;
