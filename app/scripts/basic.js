@@ -6,11 +6,13 @@
     storageData,
 
     B = {
-        init: function(callback) {
-            chrome.storage.local.get(function(items) {
-                storageData = items;
+        // 根书签目录节点的 ID
+        rootFolderId: '0',
 
+        init: function(callback) {
+            chrome.storage.local.get(function(sd) {
                 $(function() {
+                    storageData = sd;
                     callback();
                 });
             });
@@ -37,6 +39,7 @@
             });
         },
 
+        // 在新的窗口中打开页面
         openBookmarksNewWindow: function(url, isIncognito) {
             chrome.windows.create({
                 url: url,

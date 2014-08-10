@@ -19,12 +19,17 @@
 
     B.init(function() {
         // 构建默认书签列表
-        B.traversalBookmarks(
-            function(node) {
-                var item = createBMItem(node);
-                insertItem(item, true);
+        chrome.bookmarks.getChildren(B.rootFolderId, function(nodes) {
+            var i, l;
+            for (i = 0, l = nodes.length; i < l; i++) {
+                var item = createBMItem(nodes[i]);
+                bmRootList.append(item.el);
+
+                if (item.isOpen) {
+                    openBMItem(item, false);
+                }
             }
-        );
+        });
 
         // 绑定书签项的点击事件
         bmRootList.on('click', '.bm-item-title', function(e) {
@@ -103,17 +108,37 @@
     }
 
     // 打开一个书签目录项
-    function openBMItem(item) {
+    function openBMItem(item, animate) {
         item.isOpen = true;
         item.el.addClass('open');
 
-        if (item.sublistEl) {
-            item.sublistEl.slideDown();
-        }
-
+        // 存储打开状态
         B.storage(
             item.id + '-' + STORAGE_KEY_IS_OPEN,
             true);
+
+
+        // 插入子书签项
+        chrome.bookmarks.getChildren(item.id + '', function(subnodes) {
+            var subitem, i, l;
+
+            for (i = 0, l = subnodes.length; i < l; i++) {
+                subitem = createBMItem(subnodes[i]);
+                item.sublistEl.append(subitem.el);
+
+                if (subitem.isOpen) {
+                    openBMItem(subitem, animate);
+                }
+            }
+
+            if (animate !== false) {
+                item.sublistEl.slideDown();
+            }
+            else {
+                item.sublistEl.show();
+            }
+        });
+
     }
 
     // 打开一个书签目录项
@@ -121,9 +146,7 @@
         item.isOpen = false;
         item.el.removeClass('open');
 
-        if (item.sublistEl) {
-            item.sublistEl.slideUp();
-        }
+        item.sublistEl.slideUp();
 
         B.storage(
             item.id + '-' + STORAGE_KEY_IS_OPEN,
@@ -131,33 +154,42 @@
     }
 
     /**
-     * 创建并注册一个书签项
+     * 创建并注册一个书签项，如果该书签项已被创建，则不再重新创建，而是返回已有的。
      */
     function createBMItem(node) {
-        var item = {
+        var item = bmItems[node.id];
+
+        if (!item) {
+            item = {
                 id: node.id,
                 data: node,
                 isOpen: B.storage(node.id + '-' + STORAGE_KEY_IS_OPEN)
             };
 
-        if (!node.title) { return null; }
+            // bookmark
+            if (node.url) {
+                // separator bookmark
+                if (node.title.replace(_rspace, '').substring(0, 5) === '-----') {
+                    item.el = createBMSeparatorItemEl(node);
+                    item.type = BM_ITEM_TYPE_SEPARATOR;
+                }
+                // common bookmark
+                else {
+                    item.el = createBMBookmarkItemEl(node);
+                    item.type = BM_ITEM_TYPE_BOOKMARK;
+                    bmItems.allBookmarkItems.push(item);
+                }
+            }
+            // folder
+            else {
+                item.el = createBMDirectoryItemEl(node);
+                item.sublistEl = item.el.find('> .bm-sublist');
+                item.type = BM_ITEM_TYPE_DIRECTORY;
+            }
 
-        if (node.children) {
-            item.el = createBMDirectoryItemEl(node);
-            item.type = BM_ITEM_TYPE_DIRECTORY;
+            bmItems[node.id] = item;
+            bmItems.allItems.push(item);
         }
-        else if (node.title.replace(_rspace, '').substring(0, 5) === '-----') {
-            item.el = createBMSeparatorItemEl(node);
-            item.type = BM_ITEM_TYPE_SEPARATOR;
-        }
-        else if (node.url) {
-            item.el = createBMBookmarkItemEl(node);
-            item.type = BM_ITEM_TYPE_BOOKMARK;
-            bmItems.allBookmarkItems.push(item);
-        }
-
-        bmItems[node.id] = item;
-        bmItems.allItems.push(item);
 
         return item;
     }
@@ -171,6 +203,7 @@
                     '<i class="bm-item-favicon"></i>' +
                     node.title +
                 '</span>' +
+                '<ul class="bm-sublist" style="display:none"></ul>' +
             '</li>'
         );
     }
@@ -202,20 +235,6 @@
                 '</span>' +
             '</li>'
         );
-    }
-
-    // 创建一个书签子列表
-    function createBMSubList(item) {
-        var listEl = $('<ul class="bm-sublist"></ul>');
-
-        item.el.append(listEl);
-        item.sublistEl = listEl;
-
-        if (item.isOpen !== true) {
-            listEl.css('display', 'none');
-        }
-
-        return listEl;
     }
 
     /**
@@ -278,10 +297,6 @@
         }
 
         function insertToSubList(parentItem, subItem) {
-            if (!parentItem.sublistEl) {
-                createBMSubList(parentItem);
-            }
-
             parentItem.sublistEl.append(subItem.el);
         }
     }
