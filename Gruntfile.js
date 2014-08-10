@@ -45,6 +45,9 @@ module.exports = function (grunt) {
         // Project settings
         config: config,
 
+        // Package Informations
+        pkg: grunt.file.readJSON( 'package.json' ),
+
         // Empties folders to start fresh
         clean: {
             dist: {
@@ -164,6 +167,31 @@ module.exports = function (grunt) {
             }
         },
 
+        replace: {
+            dist: {
+                options: {
+                    patterns: [
+                        {
+                            match: 'VERSION',
+                            replacement: '<%= pkg.version %>'
+                        }
+                    ]
+                },
+                files: [
+                    {
+                        expand: true,
+                        cwd: '<%= config.dist %>/',
+                        src: [
+                            '**/*',
+                            '!**/vendors/**/*',
+                            '!{images,fonts}/**/*'
+                        ],
+                        dest: '<%= config.dist %>/'
+                    }
+                ]
+            }
+        },
+
         // Watches files for changes and runs tasks based on the changed files
         watch: {
             gruntfile: {
@@ -171,15 +199,19 @@ module.exports = function (grunt) {
             },
             bower: {
                 files: ['bower.json'],
-                tasks: ['bower']
+                tasks: ['bower', 'copy', 'replace']
             },
             scripts: {
                 files: ['<%= config.appJS %>/**/*.js'],
-                tasks: ['jshint']
+                tasks: ['jshint', 'copy', 'replace']
             },
             scss: {
                 files: ['<%= config.appSASS %>/**/*.{scss,sass}'],
-                tasks: ['compass', 'autoprefixer']
+                tasks: ['compass', 'autoprefixer', 'copy', 'replace']
+            },
+            file: {
+                files: ['<%= config.app %>/*.{html,json}'],
+                tasks: ['copy', 'replace']
             }
         }
     });
@@ -196,7 +228,9 @@ module.exports = function (grunt) {
 
         'uglify',
         'cssmin',
-        'imagemin'
+        'imagemin',
+
+        'replace'
     ]);
 
     grunt.registerTask('default', [

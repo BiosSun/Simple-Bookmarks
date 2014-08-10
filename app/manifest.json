@@ -1,6 +1,6 @@
 {
     "name" : "Simple Bookmarks",
-    "version" : "0.0.1",
+    "version" : "@@VERSION",
     "description" : "一个简单的书签浏览工具，一个强大的书签整理工具。",
     "icons" : {
         "16" : "images/icon_16.png",
