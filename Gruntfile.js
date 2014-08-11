@@ -53,9 +53,13 @@ module.exports = function (grunt) {
             dist: {
                 files: [{
                     dot: true,
-                    src: [
-                        'dist'
-                    ]
+                    src: ['dist']
+                }]
+            },
+            app: {
+                files: [{
+                    dot: true,
+                    src: ['app/styles']
                 }]
             }
         },
@@ -103,15 +107,11 @@ module.exports = function (grunt) {
         // Add vendor prefixed styles
         autoprefixer: {
             options: {
-                browsers: ['last 4 Chrome version']
+                browsers: ['last 2 versions']
             },
             src: {
-                files: [{
-                    expand: true,
-                    cwd: 'app/styles',
-                    src: '**/*.css',
-                    dest: 'app/styles'
-                }]
+                expand: true,
+                src: 'app/styles/**/*.css'
             }
         },
 
