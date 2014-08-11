@@ -29,6 +29,8 @@
 .context-menu-item > label > input,
 .context-menu-item > label > textarea {
   -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
   user-select: text;
 }
 
