@@ -96,11 +96,23 @@
                 openAllInNewWindow : { name: '在新窗口中打开全部书签' },
                 openAllInStealthWindow : { name: '在隐身窗口中打开全部书签' },
                 sep1 : '----------',
-                edit : { name: '编辑' },
-                remove : { name: '删除' }
+                edit : { name: '编辑', disabled: contextMenuDisabled },
+                remove : { name: '删除', disabled: contextMenuDisabled }
             }
         });
     });
+
+    function contextMenuDisabled(key, options) {
+        var item = bmItems[options.$trigger.closest('.bm-item').attr('data-id')];
+
+        if ( key === 'edit' || key === 'remove' ) {
+            if ( item.data.parentId === B.rootFolderId ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     // 处理右键菜单点击事件
     function contextMenuHandler(key, options) {
