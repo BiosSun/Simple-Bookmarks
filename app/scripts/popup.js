@@ -77,7 +77,7 @@
                 openInStealthWindow : { name: '在隐身窗口中打开书签' },
                 sep1 : '----------',
                 edit : { name: '编辑' },
-                delete : { name: '删除' }
+                remove : { name: '删除' }
             }
         });
         $.contextMenu({
@@ -85,7 +85,7 @@
             callback: contextMenuHandler,
             items: {
                 edit : { name: '编辑' },
-                delete : { name: '删除' }
+                remove : { name: '删除' }
             }
         });
         $.contextMenu({
@@ -97,7 +97,7 @@
                 openAllInStealthWindow : { name: '在隐身窗口中打开全部书签' },
                 sep1 : '----------',
                 edit : { name: '编辑' },
-                delete : { name: '删除' }
+                remove : { name: '删除' }
             }
         });
     });
@@ -128,6 +128,11 @@
             case 'openAllInStealthWindow' :
                 openChildrens(item.id, '隐身窗口', function(urls) { B.openUrlInNewWindow(urls, true); });
                 break;
+            case 'remove' :
+                chrome.bookmarks.removeTree(item.id, function() {
+                    item.el.remove();
+                    delete bmItems[item.id];
+                });
         }
     }
 
