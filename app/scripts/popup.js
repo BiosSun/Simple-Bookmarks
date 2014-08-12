@@ -1,7 +1,9 @@
 (function($, B) {
     'use strict';
 
-    var BM_ITEM_TYPE_DIRECTORY = 1,
+    var doc = $(document),
+
+        BM_ITEM_TYPE_DIRECTORY = 1,
         BM_ITEM_TYPE_BOOKMARK = 2,
         BM_ITEM_TYPE_SEPARATOR = 3,
 
@@ -63,6 +65,22 @@
         searchInput.on('keyup', function() {
             var input = $(this);
             searchItems(input.val());
+        });
+
+        // 处理全局按键事件
+        doc.on('keyup', function(e) {
+            switch (e.keyCode) {
+                // 在页面中的任何位置按 ESC 键，都会显示搜索面板，并将焦点移到搜索框中
+                case 27:
+                    var searchPanel = $('#fixed-top > .search-panel');
+
+                    if ( searchPanel.is(':hidden') ) {
+                        B.showSearchPanel();
+                    }
+
+                    $('#search').focus();
+                    break;
+            }
         });
 
         // 绑定右键菜单
