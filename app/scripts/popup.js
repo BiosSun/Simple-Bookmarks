@@ -12,7 +12,7 @@
         bmRootList = $('#bookmarks'),
         searchInput = $('#search'),
 
-        bmRootListCache = $(),
+        bmRootListCache,
         lastSearchText;
 
     B.init(function() {
@@ -189,8 +189,8 @@
 
 
         // 如果是初开始检索，将列表中的条目移入缓存中
-        if ( !bmRootListCache.length ) {
-            bmRootListCache = bmRootListCache.add(bmRootList.children().detach());
+        if ( !bmRootListCache ) {
+            bmRootListCache = bmRootList.children().detach();
         }
         else {
             bmRootList.empty();
@@ -217,7 +217,7 @@
         // 结束查询，将缓存中的条目再移回列表
         else {
             bmRootList.append(bmRootListCache);
-            bmRootListCache = $();
+            bmRootListCache = null;
         }
 
         lastSearchText = searchText;
