@@ -294,12 +294,14 @@
 
     }
 
-    // 打开一个书签目录项
+    // 关闭一个书签目录项
     function closeBMItem(item) {
         item.isOpen = false;
         item.el.removeClass('open');
 
-        item.sublistEl.slideUp();
+        item.sublistEl.slideUp(function() {
+            item.sublistEl.empty();
+        });
 
         B.storage(
             item.id + '-' + STORAGE_KEY_IS_OPEN,
