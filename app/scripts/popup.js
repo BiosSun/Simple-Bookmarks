@@ -79,6 +79,15 @@
 
                     $('#search').focus();
                     break;
+                case 13:
+                    var selectedItemEl = bmRootList.find('.bm-item.selected'),
+                        selectedItem = selectedItemEl.data('item');
+
+                    // TODO: 目前只支持打开 1 个选择条目
+                    if ( selectedItem.type === BM_ITEM_TYPE_BOOKMARK ) {
+                        B.openUrlInCurrentTab(selectedItem.data.url, true);
+                    }
+                    break;
             }
         });
 
