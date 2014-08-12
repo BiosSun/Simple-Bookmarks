@@ -303,9 +303,11 @@
             item.sublistEl.empty();
         });
 
-        B.storage(
-            item.id + '-' + STORAGE_KEY_IS_OPEN,
-            undefined);
+        item.el.add(item.el.find('.bm-item.open')).map(function() {
+            B.storage(
+                $(this).attr('data-id') + '-' + STORAGE_KEY_IS_OPEN,
+                undefined);
+        });
     }
 
     /**
