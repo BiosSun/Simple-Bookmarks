@@ -31,9 +31,9 @@
 
             node = $.extend({}, node);
 
-            if (B.isSeparatorBookmark(node)) {
+            if (B._isSeparatorBookmark(node)) {
                 node.isSeparatorBookmark = true;
-                node.title = B.getSeparatorTitle(node);
+                node.title = B._getSeparatorTitle(node);
             }
 
             descIndex = node.title.indexOf('##');
@@ -152,7 +152,7 @@
 
                 for (var i = 0, l = nodes.length; i < l; i++) {
                     node = nodes[i];
-                    if (node.url && !B.isSeparatorBookmark(node)) {
+                    if (node.url && !B._isSeparatorBookmark(node)) {
                         urls.push(node.url);
                     }
                 }
@@ -188,12 +188,12 @@
         },
 
         // 判断是否是分隔符书签
-        isSeparatorBookmark: function(node) {
+        _isSeparatorBookmark: function(node) {
             return node.url && node.title.replace(_rspace, '').substring(0, 5) === '-----';
         },
 
         // 获取分隔符书签的标题
-        getSeparatorTitle: function(node) {
+        _getSeparatorTitle: function(node) {
             return node.title.replace(_rseparator, '');
         },
 
