@@ -183,6 +183,8 @@
 
     // 根据一个字符串查询书签项
     function searchItems(searchText) {
+        var isFirstMatching = true;
+
         searchText = $.trim(searchText).toLowerCase();
 
         if (searchText === lastSearchText) { return; }
@@ -196,7 +198,7 @@
             bmRootList.empty();
         }
 
-        // 开始查询
+        // 包含查询文字时，开始进行查询
         if (searchText) {
             B.traversalBookmarks(function(node) {
                 if (node.url && !B.isSeparatorBookmark(node)) {  // is bookmark node
@@ -205,6 +207,11 @@
                     if ( B.isMatching(node, searchText) ) {
                         item = createBMItem(node);
                         bmRootList.append(item.el);
+
+                        if ( isFirstMatching ) {
+                            selectedBMItem(item);
+                            isFirstMatching = false;
+                        }
                     }
                 }
             });
@@ -216,6 +223,11 @@
         }
 
         lastSearchText = searchText;
+    }
+
+    // 选中一个条目
+    function selectedBMItem(item) {
+        item.el.addClass('selected');
     }
 
     // 切换一个书签目录项的打开与关闭状态
