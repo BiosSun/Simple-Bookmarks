@@ -2744,12 +2744,7 @@ button, input, select {
   margin-left: 25px;
 }
 
-/* line 156, ../sass/main.scss */
-.bm-item.selected .bm-item-title {
-  background: #e0e0e0;
-}
-
-/* line 162, ../sass/main.scss */
+/* line 157, ../sass/main.scss */
 .bm-item-title {
   display: block;
   color: #333;
@@ -2764,13 +2759,18 @@ button, input, select {
   padding-left: 2700px;
   cursor: pointer;
 }
-/* line 175, ../sass/main.scss */
+/* line 170, ../sass/main.scss */
+.bm-item-title.isurl {
+  color: #999;
+}
+/* line 174, ../sass/main.scss */
 .bm-item-title:hover, .bm-item-title.context-menu-active {
   background: #e0e0e0;
 }
-/* line 179, ../sass/main.scss */
-.bm-item-title .isurl {
-  color: #999;
+/* line 178, ../sass/main.scss */
+.selected .bm-item-title {
+  background: #f0f0f0;
+  color: #D10D0D;
 }
 
 /* line 184, ../sass/main.scss */

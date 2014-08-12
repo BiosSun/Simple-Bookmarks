@@ -152,11 +152,6 @@ button, input, select {
 }
 
 .bm-item {
-    &.selected {
-        .bm-item-title {
-            background: #e0e0e0;
-        }
-    }
 }
 
 .bm-item-title {
@@ -172,12 +167,17 @@ button, input, select {
 
     cursor: pointer;
 
+    &.isurl {
+        color: #999;
+    }
+
     &:hover, &.context-menu-active {
         background: #e0e0e0;
     }
 
-    .isurl {
-        color: #999;
+    .selected & {
+        background: #f0f0f0;
+        color: #D10D0D;
     }
 }
 

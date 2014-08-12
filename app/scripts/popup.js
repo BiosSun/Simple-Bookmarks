@@ -372,9 +372,9 @@
         var title = item.data.title,
             url = item.data.url;
 
-        item.el.find('.bm-item-title .text').toggleClass('isurl', !title).text(title || url);
-        item.el.find('.bm-item-title').attr('href', url);
-        item.el.find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url);
+        item.el.find('.bm-item-title').toggleClass('isurl', !title).attr('href', url)
+               .find('.text').text(title || url).end()
+               .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url);
     }
 
     function fillBMSeparatorItem(item) {
