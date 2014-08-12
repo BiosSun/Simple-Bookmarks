@@ -175,12 +175,12 @@ button, input, select {
         outline: 0;
     }
 
-    &:hover, .less.selected &, &.context-menu-active {
+    &:hover, .less.selected > &, &.context-menu-active {
         background: #f0f0f0;
         color: inherit;
     }
 
-    .selected & {
+    .selected > & {
         background: #e0e0e0;
         color: #D10D0D;
     }
@@ -227,28 +227,46 @@ button, input, select {
     }
 }
 
-.bm-item-separator > .bm-item-title {
-    position: relative;
-    display: flex;
-
-    .line-l, .line-r {
-        display: block;
-        height: 0;
-        margin: 9px 0 0;
-        border-bottom: 1px dashed #bbb;
-    }
-
-    .line-l {
-        width: 20px;
-    }
-
-    .line-r {
-        flex: 1;
-    }
-
-    .text {
-        padding: 0 6px;
+.bm-item-separator {
+    > .bm-item-title {
+        position: relative;
+        display: flex;
         color: #999;
+
+        .line-l, .line-r {
+            display: block;
+            height: 0;
+            margin: 9px 0 0;
+            border-bottom: 1px dashed #bbb;
+        }
+
+        .line-l {
+            width: 20px;
+        }
+
+        .line-r {
+            flex: 1;
+        }
+
+        .text {
+            padding: 0 6px;
+        }
+    }
+
+    &.selected >.bm-item-title {
+        color: #d10d0d;
+
+        .line-l, .line-r {
+            border-color: #d10d0d;
+        }
+    }
+
+    &.selected.less > .bm-item-title {
+        color: #999;
+
+        .line-l, .line-r {
+            border-color: #bbb;
+        }
     }
 }
 
