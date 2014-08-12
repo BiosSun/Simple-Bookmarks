@@ -12,8 +12,8 @@
         bmRootList = $('#bookmarks'),
         searchInput = $('#search'),
 
-        bmRootListCache,
-        lastSearchText;
+        lastSearchText = '',
+        bmRootListCache;
 
     B.init(function() {
         // 构建默认书签列表
@@ -197,7 +197,6 @@
         searchText = $.trim(searchText).toLowerCase();
 
         if (searchText === lastSearchText) { return; }
-
 
         // 如果是初开始检索，将列表中的条目移入缓存中
         if ( !bmRootListCache ) {
