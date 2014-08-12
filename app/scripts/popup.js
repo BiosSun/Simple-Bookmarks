@@ -369,9 +369,12 @@
     }
 
     function updateBMBookmarkItem(item) {
-        item.el.find('.bm-item-title .text').text(item.data.title);
-        item.el.find('.bm-item-title').attr('href', item.data.url);
-        item.el.find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + item.data.url);
+        var title = item.data.title,
+            url = item.data.url;
+
+        item.el.find('.bm-item-title .text').toggleClass('isurl', !title).text(title || url);
+        item.el.find('.bm-item-title').attr('href', url);
+        item.el.find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url);
     }
 
     function fillBMSeparatorItem(item) {

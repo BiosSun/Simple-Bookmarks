@@ -175,6 +175,10 @@ button, input, select {
     &:hover, &.context-menu-active {
         background: #e0e0e0;
     }
+
+    .isurl {
+        color: #999;
+    }
 }
 
 .bm-item-favicon {
