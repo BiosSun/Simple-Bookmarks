@@ -200,14 +200,9 @@
         if (searchText) {
             B.traversalBookmarks(function(node) {
                 if (node.url && !B.isSeparatorBookmark(node)) {  // is bookmark node
-                    var title = $.trim(node.title).toLowerCase(),
-                        desc = $.trim(node.desc).toLowerCase(),
-                        url = $.trim(node.url).toLowerCase(),
-                        item;
+                    var item;
 
-                    if (title.indexOf(searchText) !== -1 ||
-                        desc.indexOf(searchText) !== -1 ||
-                        url.indexOf(searchText) !== -1) {
+                    if ( B.isMatching(node, searchText) ) {
                         item = createBMItem(node);
                         bmRootList.append(item.el);
                     }

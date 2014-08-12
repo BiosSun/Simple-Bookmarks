@@ -328,6 +328,23 @@
             submitBtn.text('修改');
             B.hideSearchPanel(editPanel);
             titleInput.focus();
+        },
+
+        /**
+         * 判断查询内容是否匹配某个条目
+         */
+        isMatching: function(node, searchText) {
+            var title = node.title ? node.title.toLowerCase() : '',
+                desc = node.desc ? node.desc.toLowerCase() : '',
+                url = node.url ? node.url.toLowerCase() : '';
+
+            if (title.indexOf(searchText) !== -1 ||
+                desc.indexOf(searchText) !== -1 ||
+                url.indexOf(searchText) !== -1) {
+                return true;
+            }
+
+            return false;
         }
     };
 
