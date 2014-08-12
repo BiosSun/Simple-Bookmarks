@@ -209,24 +209,26 @@ button, input, select {
 
 .bm-item-separator > .bm-item-title {
     position: relative;
+    display: flex;
 
-    .line {
+    .line-l, .line-r {
         display: block;
-        margin: 9px 0 -10px;
+        height: 0;
+        margin: 9px 0 0;
         border-bottom: 1px dashed #bbb;
     }
 
-    .text {
-        margin-left: 20px;
-        padding: 0 5px;
-        color: #999;
-        background: #fff;
+    .line-l {
+        width: 20px;
     }
 
-    &:hover, &.context-menu-active {
-        .text {
-            background: #e0e0e0;
-        }
+    .line-r {
+        flex: 1;
+    }
+
+    .text {
+        padding: 0 6px;
+        color: #999;
     }
 }
 

@@ -380,8 +380,9 @@
     function fillBMSeparatorItem(item) {
         item.el.addClass('bm-item-separator').append(
             '<span class="bm-item-title">' +
-                '<span class="line"></span>' +
+                '<span class="line-l"></span>' +
                 '<span class="text"></span>' +
+                '<span class="line-r"></span>' +
             '</span>'
         );
 
