@@ -201,7 +201,7 @@
         // 包含查询文字时，开始进行查询
         if (searchText) {
             B.traversalBookmarks(function(node) {
-                if (node.url && !B.isSeparatorBookmark(node)) {  // is bookmark node
+                if ( node.url && !node.isSeparatorBookmark ) {  // is bookmark node
                     var item;
 
                     if ( B.isMatching(node, searchText) ) {
