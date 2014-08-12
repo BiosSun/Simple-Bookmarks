@@ -13,7 +13,8 @@
         searchInput = $('#search'),
         bmItems = {},
 
-        bmRootListCache = $();
+        bmRootListCache = $(),
+        lastSearchText;
 
     B.init(function() {
         // 构建默认书签列表
@@ -186,6 +187,8 @@
     function searchItems(searchText) {
         searchText = $.trim(searchText).toLowerCase();
 
+        if (searchText === lastSearchText) { return; }
+
 
         // 如果是初开始检索，将列表中的条目移入缓存中
         if ( !bmRootListCache.length ) {
@@ -218,6 +221,8 @@
             bmRootList.append(bmRootListCache);
             bmRootListCache = $();
         }
+
+        lastSearchText = searchText;
     }
 
     // 切换一个书签目录项的打开与关闭状态
