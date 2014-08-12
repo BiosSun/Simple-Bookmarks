@@ -11,7 +11,6 @@
 
         bmRootList = $('#bookmarks'),
         searchInput = $('#search'),
-        bmItems = {},
 
         bmRootListCache = $(),
         lastSearchText;
@@ -34,7 +33,7 @@
         // 绑定书签项的点击事件
         bmRootList.on('click', '.bm-item-title', function(e) {
             var itemEl = $(this).closest('.bm-item'),
-                item = bmItems[itemEl.attr('data-id')],
+                item = itemEl.data('item'),
 
                 isCtrlMeta = e.ctrlKey || e.metaKey,
                 isShift = e.shiftKey,
@@ -120,7 +119,7 @@
     });
 
     function contextMenuDisabled(key, options) {
-        var item = bmItems[options.$trigger.closest('.bm-item').attr('data-id')];
+        var item = options.$trigger.closest('.bm-item').data('item');
 
         if ( key === 'edit' || key === 'remove' ) {
             if ( item.data.parentId === B.rootFolderId ) {
@@ -133,7 +132,7 @@
 
     // 处理右键菜单点击事件
     function contextMenuHandler(key, options) {
-        var item = bmItems[options.$trigger.closest('.bm-item').attr('data-id')];
+        var item = options.$trigger.closest('.bm-item').data('item');
 
         switch(key) {
             case 'open' :
@@ -160,7 +159,6 @@
             case 'remove' :
                 chrome.bookmarks.removeTree(item.id, function() {
                     item.el.remove();
-                    delete bmItems[item.id];
                 });
                 break;
             case 'edit' :
@@ -211,7 +209,7 @@
                         desc.indexOf(searchText) !== -1 ||
                         url.indexOf(searchText) !== -1) {
                         item = createBMItem(node);
-                        insertItem(item);
+                        bmRootList.append(item.el);
                     }
                 }
             });
@@ -286,43 +284,39 @@
      * 创建并注册一个书签项，如果该书签项已被创建，则不再重新创建，而是返回已有的。
      */
     function createBMItem(node) {
-        var item = bmItems[node.id], el;
-
-        if (!item) {
-            el = $(
+        var item = {
+            id: node.id,
+            data: node,
+            el: $(
                 '<li id="bmitem-' + node.id + '" class="bm-item"' +
                    ' data-id="' + node.id + '"' +
                    ' data-index="' + node.index + '">' +
-                '</li>');
+                '</li>'
+            ),
+            isOpen: B.storage(node.id + '-' + STORAGE_KEY_IS_OPEN)
+        };
 
-            item = {
-                id: node.id,
-                data: node,
-                el: el,
-                isOpen: B.storage(node.id + '-' + STORAGE_KEY_IS_OPEN)
-            };
-
-            // bookmark
-            if (node.url) {
-                // separator bookmark
-                if (node.isSeparatorBookmark) {
-                    fillBMSeparatorItem(item);
-                    item.type = BM_ITEM_TYPE_SEPARATOR;
-                }
-                // common bookmark
-                else {
-                    fillBMBookmarkItem(item);
-                    item.type = BM_ITEM_TYPE_BOOKMARK;
-                }
+        // bookmark
+        if (node.url) {
+            // separator bookmark
+            if (node.isSeparatorBookmark) {
+                fillBMSeparatorItem(item);
+                item.type = BM_ITEM_TYPE_SEPARATOR;
             }
-            // folder
+            // common bookmark
             else {
-                fillBMDirectoryItem(item);
-                item.type = BM_ITEM_TYPE_DIRECTORY;
+                fillBMBookmarkItem(item);
+                item.type = BM_ITEM_TYPE_BOOKMARK;
             }
-
-            bmItems[node.id] = item;
         }
+        // folder
+        else {
+            fillBMDirectoryItem(item);
+            item.type = BM_ITEM_TYPE_DIRECTORY;
+        }
+
+        // 创建双向绑定
+        item.el.data('item', item);
 
         return item;
     }
@@ -404,69 +398,5 @@
     function updateBMSeparatorItem(item) {
         var title  = item.data.title;
         item.el.find('.bm-item-title .text').toggleClass('h', !title).text(title);
-    }
-
-    /**
-     * 将一个书签项插入到书签列表中，
-     * 如果当前书签列表中有待插入书签项的父目录项，
-     * 则将其插入到父目录项中，
-     * 如果父目录项不存在或无法插入到页面中时，
-     * 将其插入到根列表下。
-     *
-     * @param item {Object}
-     *     书签项数据对象
-     *
-     * @param isCreatePath {Boolean}
-     *     当父目录项不存在（或没有插入到页面中）时，是否要创建父目录项（或插入到页面中），
-     *     若为 false，则会直接将该节点插入到根列表下。
-     */
-    function insertItem(item, isCreatePath) {
-        if (!item) { return; }
-
-        var pId = item.data.parentId,
-            pItem = bmItems[pId];
-
-        if (isCreatePath) {
-            if (!pItem) {
-                chrome.bookmarks.get(pId + '', function(nodes) {
-                    var pNode = nodes && nodes[0];
-
-                    if (pNode && B.isCorrectNode(pNode)) {
-                        pItem = createBMItem(pNode);
-                        insertItem(pItem, isCreatePath);
-                    }
-
-                    insert(item);
-                });
-            }
-            else if ( !$.contains(document.body, pItem.el[0]) ) {
-                insertItem(pItem, isCreatePath);
-                insertToSubList(pItem, item);
-            }
-            else {
-                insert();
-            }
-        }
-        else {
-            insert();
-        }
-
-        function insert() {
-            // 如果父目录项存在，且在页面中
-            if (pItem && $.contains(document.body, pItem.el[0])) {
-                insertToSubList(pItem, item);
-            }
-            else {
-                insertToRootList(item);
-            }
-        }
-
-        function insertToRootList(item) {
-            bmRootList.append(item.el);
-        }
-
-        function insertToSubList(parentItem, subItem) {
-            parentItem.sublistEl.append(subItem.el);
-        }
     }
 })(jQuery, simpleBookmarks);
