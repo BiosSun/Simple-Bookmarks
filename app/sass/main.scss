@@ -188,8 +188,6 @@ button, input, select {
     height: 22px;
     margin: 0 5px 0 0;
 
-    font: 16px/22px FontAwesome;
-
     overflow: hidden;
     text-align: center;
     vertical-align: middle;
@@ -197,14 +195,31 @@ button, input, select {
     color: #87A9C4;
 }
 
-.bm-item-directory > .bm-item-title > .bm-item-favicon:before {
-    // content: "\f114";
-    content: "\f07b";
+.bm-item-bookmark > .bm-item-title > .bm-item-favicon {
+    font-size: 0;
+    line-height: 22px;
+
+    img {
+        vertical-align: middle;
+        position: relative;
+        top: -1px;
+    }
 }
 
-.bm-item-directory.open > .bm-item-title > .bm-item-favicon:before {
-    // content: "\f115";
-    content: "\f07c";
+.bm-item-directory > .bm-item-title > .bm-item-favicon {
+    font: 16px/22px FontAwesome;
+
+    &:before {
+        // content: "\f114";
+        content: "\f07b";
+    }
+}
+
+.bm-item-directory.open > .bm-item-title > .bm-item-favicon {
+    &:before {
+        // content: "\f115";
+        content: "\f07c";
+    }
 }
 
 .bm-item-separator > .bm-item-title {
