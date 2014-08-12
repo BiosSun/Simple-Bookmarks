@@ -11,10 +11,9 @@
 
         bmRootList = $('#bookmarks'),
         searchInput = $('#search'),
-        bmItems = {
-            allItems: [],
-            allBookmarkItems: []
-        };
+        bmItems = {},
+
+        bmRootListCache = $();
 
     B.init(function() {
         // 构建默认书签列表
@@ -185,30 +184,40 @@
 
     // 根据一个字符串查询书签项
     function searchItems(searchText) {
-        var result = [];
-
         searchText = $.trim(searchText).toLowerCase();
 
+
+        // 如果是初开始检索，将列表中的条目移入缓存中
+        if ( !bmRootListCache.length ) {
+            bmRootListCache = bmRootListCache.add(bmRootList.children().detach());
+        }
+        else {
+            bmRootList.empty();
+        }
+
+        // 开始查询
         if (searchText) {
-            bmRootList.children().detach();
+            B.traversalBookmarks(function(node) {
+                if (node.url && !B.isSeparatorBookmark(node)) {  // is bookmark node
+                    var title = $.trim(node.title).toLowerCase(),
+                        desc = $.trim(node.desc).toLowerCase(),
+                        url = $.trim(node.url).toLowerCase(),
+                        item;
 
-            $.each(bmItems.allBookmarkItems, function(i, item) {
-                var title = item.data.title.toLowerCase(),
-                    url = item.data.url.toLowerCase();
-
-                if (title.indexOf(searchText) !== -1 ||
-                   url.indexOf(searchText) !== -1) {
-                    result.push(item);
+                    if (title.indexOf(searchText) !== -1 ||
+                        desc.indexOf(searchText) !== -1 ||
+                        url.indexOf(searchText) !== -1) {
+                        item = createBMItem(node);
+                        insertItem(item);
+                    }
                 }
             });
         }
+        // 结束查询，将缓存中的条目再移回列表
         else {
-            result = bmItems.allItems;
+            bmRootList.append(bmRootListCache);
+            bmRootListCache = $();
         }
-
-        $.each(result, function(i, item) {
-            insertItem(item);
-        });
     }
 
     // 切换一个书签目录项的打开与关闭状态
@@ -299,7 +308,6 @@
                 else {
                     fillBMBookmarkItem(item);
                     item.type = BM_ITEM_TYPE_BOOKMARK;
-                    bmItems.allBookmarkItems.push(item);
                 }
             }
             // folder
@@ -309,7 +317,6 @@
             }
 
             bmItems[node.id] = item;
-            bmItems.allItems.push(item);
         }
 
         return item;

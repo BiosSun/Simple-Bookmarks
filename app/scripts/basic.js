@@ -161,9 +161,35 @@
             });
         },
 
+        // 遍历书签
+        traversalBookmarks: function(nodefc) {
+            chrome.bookmarks.getTree(function(results) {
+                if ($.isArray(results)) {
+                    $.each(results, function(i, node) {
+                        B._traversalBookmarkNode(node, nodefc);
+                    });
+                }
+                else {
+                    B._traversalBookmarkNode(results, nodefc);
+                }
+            });
+        },
+
+        _traversalBookmarkNode: function(node, callback) {
+            if (node.title) {
+                callback(node);
+            }
+
+            if (node.children) {
+                $.each(node.children, function(i, node) {
+                    B._traversalBookmarkNode(B.extendNode(node), callback);
+                });
+            }
+        },
+
         // 判断是否是分隔符书签
         isSeparatorBookmark: function(node) {
-            return node.title.replace(_rspace, '').substring(0, 5) === '-----';
+            return node.url && node.title.replace(_rspace, '').substring(0, 5) === '-----';
         },
 
         // 获取分隔符书签的标题
