@@ -226,7 +226,7 @@
                         bmRootList.append(item.el);
 
                         if ( isFirstMatching ) {
-                            selectBMItem(item);
+                            selectBMItem(item, true);
                             isFirstMatching = false;
                         }
                     }
@@ -243,10 +243,10 @@
     }
 
     // 选中一个条目
-    function selectBMItem(item) {
+    function selectBMItem(item, less) {
         var nowSelectedItemEl = bmRootList.find('.bm-item.selected');
-        nowSelectedItemEl.removeClass('selected');
-        item.el.addClass('selected');
+        nowSelectedItemEl.removeClass('selected less');
+        item.el.addClass('selected' + (less ? ' less' : ''));
     }
 
     // 切换一个书签目录项的打开与关闭状态

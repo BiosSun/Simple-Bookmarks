@@ -171,12 +171,17 @@ button, input, select {
         color: #999;
     }
 
-    &:hover, &.context-menu-active {
-        background: #e0e0e0;
+    &:focus {
+        outline: 0;
+    }
+
+    &:hover, .less.selected &, &.context-menu-active {
+        background: #f0f0f0;
+        color: inherit;
     }
 
     .selected & {
-        background: #f0f0f0;
+        background: #e0e0e0;
         color: #D10D0D;
     }
 }
