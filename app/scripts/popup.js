@@ -12,6 +12,7 @@
         bmRootList = $('#bookmarks'),
         searchInput = $('#search'),
 
+        // search
         lastSearchText = '',
         bmRootListCache;
 
@@ -125,6 +126,14 @@
                 remove : { name: '删除', disabled: contextMenuDisabled }
             }
         });
+
+        // 使用 tab 键在列表中选择书签条目
+        bmRootList.on('focus', '.bm-item-title', function() {
+            var itemEl = $(this).closest('.bm-item'),
+                item = itemEl.data('item');
+
+            selectBMItem(item);
+        });
     });
 
     function contextMenuDisabled(key, options) {
@@ -217,7 +226,7 @@
                         bmRootList.append(item.el);
 
                         if ( isFirstMatching ) {
-                            selectedBMItem(item);
+                            selectBMItem(item);
                             isFirstMatching = false;
                         }
                     }
@@ -234,7 +243,9 @@
     }
 
     // 选中一个条目
-    function selectedBMItem(item) {
+    function selectBMItem(item) {
+        var nowSelectedItemEl = bmRootList.find('.bm-item.selected');
+        nowSelectedItemEl.removeClass('selected');
         item.el.addClass('selected');
     }
 
