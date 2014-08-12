@@ -7,10 +7,23 @@
     </head>
     <body>
         <div id="fixed-top">
+            <form class="fixed-top-panel edit-panel form" action="#" post="post" style="display: none;">
+                <div class="form-group">
+                    <input class="form-control" name="title" type="text" placeholder="标题" value="" />
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" name="desc" rows="3" placeholder="描述"></textarea>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" name="url" type="text" placeholder="URL" value="" />
+                </div>
+                <div class="form-footer">
+                    <button type="submit" class="btn submit">创建</button>
+                    <button type="button" class="btn cancel">取消</button>
+                </div>
+            </form>
             <div class="fixed-top-panel confirm-panel" style="display: none;">
-                <p>
-                    你确定要在新标签页中打开 27 个页面吗？
-                </p>
+                <p></p>
                 <div class="button-bar">
                     <button type="button" class="btn confirm">确定</button>
                     <button type="button" class="btn cancel">取消</button>

@@ -7,8 +7,6 @@
 
         STORAGE_KEY_IS_OPEN = '1',
 
-        _rseparator = /[\s-]/g,
-
         bmRootList = $('#bookmarks'),
         searchInput = $('#search'),
         bmItems = {
@@ -18,10 +16,11 @@
 
     B.init(function() {
         // 构建默认书签列表
-        chrome.bookmarks.getChildren(B.rootFolderId, function(nodes) {
-            var i, l;
+        B.getChildren(B.rootFolderId, function(nodes) {
+            var i, l, item, node;
             for (i = 0, l = nodes.length; i < l; i++) {
-                var item = createBMItem(nodes[i]);
+                node = nodes[i];
+                item = createBMItem(node);
                 bmRootList.append(item.el);
 
                 if (item.isOpen) {
@@ -145,6 +144,13 @@
                     item.el.remove();
                     delete bmItems[item.id];
                 });
+                break;
+            case 'edit' :
+                B.edit(item.data, function() {
+                    // update el data
+                    updateBMItem(item);
+                });
+                break;
         }
     }
 
@@ -209,11 +215,12 @@
 
 
         // 插入子书签项
-        chrome.bookmarks.getChildren(item.id + '', function(subnodes) {
-            var subitem, i, l;
+        B.getChildren(item.id, function(subnodes) {
+            var subitem, subnode, i, l;
 
             for (i = 0, l = subnodes.length; i < l; i++) {
-                subitem = createBMItem(subnodes[i]);
+                subnode = subnodes[i];
+                subitem = createBMItem(subnode);
                 item.sublistEl.append(subitem.el);
 
                 if (subitem.isOpen) {
@@ -247,33 +254,39 @@
      * 创建并注册一个书签项，如果该书签项已被创建，则不再重新创建，而是返回已有的。
      */
     function createBMItem(node) {
-        var item = bmItems[node.id];
+        var item = bmItems[node.id], el;
 
         if (!item) {
+            el = $(
+                '<li id="bmitem-' + node.id + '" class="bm-item"' +
+                   ' data-id="' + node.id + '"' +
+                   ' data-index="' + node.index + '">' +
+                '</li>');
+
             item = {
                 id: node.id,
                 data: node,
+                el: el,
                 isOpen: B.storage(node.id + '-' + STORAGE_KEY_IS_OPEN)
             };
 
             // bookmark
             if (node.url) {
                 // separator bookmark
-                if (B.isSeparatorBookmark(node)) {
-                    item.el = createBMSeparatorItemEl(node);
+                if (node.isSeparatorBookmark) {
+                    fillBMSeparatorItem(item);
                     item.type = BM_ITEM_TYPE_SEPARATOR;
                 }
                 // common bookmark
                 else {
-                    item.el = createBMBookmarkItemEl(node);
+                    fillBMBookmarkItem(item);
                     item.type = BM_ITEM_TYPE_BOOKMARK;
                     bmItems.allBookmarkItems.push(item);
                 }
             }
             // folder
             else {
-                item.el = createBMDirectoryItemEl(node);
-                item.sublistEl = item.el.find('> .bm-sublist');
+                fillBMDirectoryItem(item);
                 item.type = BM_ITEM_TYPE_DIRECTORY;
             }
 
@@ -284,47 +297,79 @@
         return item;
     }
 
-    function createBMDirectoryItemEl(node) {
-        return $(
-            '<li id="bmitem-' + node.id + '" class="bm-item bm-item-directory"' +
-                ' data-id="' + node.id + '"' +
-                ' data-index="' + node.index + '">' +
-                '<span class="bm-item-title">' +
-                    '<i class="bm-item-favicon"></i>' +
-                    node.title +
-                '</span>' +
-                '<ul class="bm-sublist" style="display:none"></ul>' +
-            '</li>'
-        );
+    /**
+     *  根据节点数据更新 Item 的显示内容
+     */
+    function updateBMItem(item) {
+        item.el.attr('data-index', item.data.index);
+
+        // bookmark
+        if (item.data.url) {
+            // separator bookmark
+            if (item.data.isSeparatorBookmark) {
+                updateBMSeparatorItem(item);
+            }
+            // common bookmark
+            else {
+                updateBMBookmarkItem(item);
+            }
+        }
+        // folder
+        else {
+            updateBMDirectoryItem(item);
+        }
     }
 
-    function createBMBookmarkItemEl(node) {
-        return $(
-            '<li id="bmitem-' + node.id + '" class="bm-item bm-item-bookmark"' +
-                ' data-id="' + node.id + '"' +
-                ' data-index="' + node.index + '">' +
-                '<a class="bm-item-title" href="' + node.url + '">' +
-                    '<i class="bm-item-favicon">' +
-                        '<img src="chrome://favicon/' + node.url + '" />' +
-                    '</i>' +
-                    node.title +
-                '</a>' +
-            '</li>'
+    function fillBMDirectoryItem(item) {
+        item.sublistEl = $('<ul class="bm-sublist" style="display:none"></ul>');
+        item.el.addClass('bm-item-directory').append(
+            '<span class="bm-item-title">' +
+                '<i class="bm-item-favicon"></i>' +
+                '<span class="text"></span>' +
+            '</span>',
+            item.sublistEl
         );
+
+        updateBMDirectoryItem(item);
     }
 
-    function createBMSeparatorItemEl(node) {
-        var title = node.title.replace(_rseparator, '');
-        return $(
-            '<li id="bmitem-' + node.id + '" class="bm-item bm-item-separator"' +
-                ' data-id="' + node.id + '"' +
-                ' data-index="' + node.index + '">' +
-                '<span class="bm-item-title">' +
-                    '<span class="line"></span>' +
-                    '<span class="text">' + title + '</span>' +
-                '</span>' +
-            '</li>'
+    function updateBMDirectoryItem(item) {
+        item.el.find('.bm-item-title .text').text(item.data.title);
+    }
+
+    function fillBMBookmarkItem(item) {
+        item.el.addClass('bm-item-bookmark').append(
+            '<a class="bm-item-title">' +
+                '<i class="bm-item-favicon">' +
+                    '<img />' +
+                '</i>' +
+                '<span class="text"></span>' +
+            '</a>'
         );
+
+        updateBMBookmarkItem(item);
+    }
+
+    function updateBMBookmarkItem(item) {
+        item.el.find('.bm-item-title .text').text(item.data.title);
+        item.el.find('.bm-item-title').attr('href', item.data.url);
+        item.el.find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + item.data.url);
+    }
+
+    function fillBMSeparatorItem(item) {
+        item.el.addClass('bm-item-separator').append(
+            '<span class="bm-item-title">' +
+                '<span class="line"></span>' +
+                '<span class="text"></span>' +
+            '</span>'
+        );
+
+        updateBMSeparatorItem(item);
+    }
+
+    function updateBMSeparatorItem(item) {
+        var title  = item.data.title;
+        item.el.find('.bm-item-title .text').toggleClass('h', !title).text(title);
     }
 
     /**

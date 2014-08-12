@@ -3,13 +3,18 @@
 
     var
 
+    doc = $(document),
+
     _rspace = /\s/g,
+    _rseparator = /[\s-]/g,
 
     storageData,
 
     B = {
         // 根书签目录节点的 ID
         rootFolderId: '0',
+
+        defSeparator: '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ',
 
         init: function(callback) {
             chrome.storage.local.get(function(sd) {
@@ -18,6 +23,55 @@
                     callback();
                 });
             });
+        },
+
+        // 复制并扩展节点对象的内容到一个新的对象中
+        extendNode: function(node) {
+            var descIndex;
+
+            node = $.extend({}, node);
+
+            if (B.isSeparatorBookmark(node)) {
+                node.isSeparatorBookmark = true;
+                node.title = B.getSeparatorTitle(node);
+            }
+
+            descIndex = node.title.indexOf('##');
+            if (descIndex !== -1) {
+                node.desc = node.title.substring(descIndex + 2);
+                node.title = node.title.substring(0, descIndex);
+            }
+
+            return node;
+        },
+
+        // 恢复对节点对象的扩展的内容
+        unextendNode: function(node) {
+            node = $.extend({}, node);
+
+            if (node.isSeparatorBookmark) {
+                node.title = B.defSeparator + node.title;
+                delete node.isSeparatorBookmark;
+            }
+
+            if (node.desc) {
+                node.title += '##' + node.desc;
+                delete node.desc;
+            }
+
+            return node;
+        },
+
+        // 更新节点对象
+        update: function(node, callback) {
+            node = B.unextendNode(node);
+
+            var id = node.id,
+                data = {
+                    title: node.title,
+                    url: node.url
+                };
+            chrome.bookmarks.update(id, data, callback);
         },
 
         // 在当前标签页中打开页面
@@ -63,39 +117,37 @@
             });
         },
 
-        // 遍历书签
-        traversalBookmarks: function(nodefc) {
-            chrome.bookmarks.getTree(function(results) {
-                if ($.isArray(results)) {
-                    $.each(results, function(i, node) {
-                        B._traversalBookmarkNode(node, nodefc);
-                    });
+        get: function(ids, callback) {
+            if (typeof ids !== 'string' && !$.isArray(ids)) {
+                ids = ids + '';
+            }
+
+            chrome.bookmarks.get(ids, function(nodes) {
+                if ( $.isArray(nodes) ) {
+                    for (var i = 0, l = nodes.length; i < l; i++) {
+                        nodes[i] = B.extendNode(nodes[i]);
+                    }
                 }
-                else {
-                    B._traversalBookmarkNode(results, nodefc);
-                }
+
+                callback(nodes);
             });
         },
 
-        _traversalBookmarkNode: function(node, callback) {
-            if (node.title) {
-                callback(node);
-            }
+        getChildren: function(folderId, callback) {
+            chrome.bookmarks.getChildren(folderId + '', function(nodes) {
+                if ( $.isArray(nodes) ) {
+                    for (var i = 0, l = nodes.length; i < l; i++) {
+                        nodes[i] = B.extendNode(nodes[i]);
+                    }
+                }
 
-            if (node.children) {
-                $.each(node.children, function(i, node) {
-                    B._traversalBookmarkNode(node, callback);
-                });
-            }
-        },
-
-        isSeparatorBookmark: function(node) {
-            return node.title.replace(_rspace, '').substring(0, 5) === '-----';
+                callback(nodes);
+            });
         },
 
         // 获取指定书签目录下所有子书签的 url
-        getChildrenUrls: function(id, callback) {
-            chrome.bookmarks.getChildren(id, function(nodes) {
+        getChildrenUrls: function(folderId, callback) {
+            chrome.bookmarks.getChildren(folderId, function(nodes) {
                 var urls = [], node;
 
                 for (var i = 0, l = nodes.length; i < l; i++) {
@@ -107,6 +159,16 @@
 
                 callback(urls);
             });
+        },
+
+        // 判断是否是分隔符书签
+        isSeparatorBookmark: function(node) {
+            return node.title.replace(_rspace, '').substring(0, 5) === '-----';
+        },
+
+        // 获取分隔符书签的标题
+        getSeparatorTitle: function(node) {
+            return node.title.replace(_rseparator, '');
         },
 
         // 判断所传入的节点是否有效
@@ -174,6 +236,72 @@
             B.hideSearchPanel(confirmPanel);
 
             confirmPanel.find('.confirm')[0].focus();
+        },
+
+        // 显示一个编辑表单
+        edit: function(node, callback) {
+            var editPanel  = $('#fixed-top .edit-panel'),
+
+                titleGroup = editPanel.find('.form-group:has([name=title])'),
+                descGroup  = editPanel.find('.form-group:has([name=desc])'),
+                urlGroup   = editPanel.find('.form-group:has([name=url])'),
+
+                titleInput = titleGroup.find('.form-control'),
+                descInput  = descGroup.find('.form-control'),
+                urlInput   = urlGroup.find('.form-control'),
+
+                submitBtn  = editPanel.find('.submit');
+
+            titleInput.val('');
+            descInput.val('');
+            urlInput.val('');
+
+            if (node.isSeparatorBookmark) {
+                titleGroup.show();
+                descGroup.hide();
+                urlGroup.hide();
+                titleInput.val(node.title);
+            }
+            else if (node.url) {
+                titleGroup.show();
+                descGroup.show();
+                urlGroup.show();
+                titleInput.val(node.title);
+                descInput.val(node.desc);
+                urlInput.val(node.url);
+            }
+            else {
+                titleGroup.show();
+                descGroup.show();
+                urlGroup.hide();
+                titleInput.val(node.title);
+                descInput.val(node.desc);
+            }
+
+            editPanel.off('.edit');
+
+            editPanel.on('click.edit', '.cancel', function() {
+                B.showSearchPanel();
+            });
+
+            editPanel.on('submit.edit', function() {
+                $.extend(node, {
+                    title: $.trim(titleInput.val()),
+                    desc: $.trim(descInput.val()),
+                    url: $.trim(urlInput.val()) || undefined
+                });
+                B.update(node, function() {
+                    B.showSearchPanel();
+                    callback(node);
+                    doc.trigger('bm.update', node);
+                });
+
+                return false;
+            });
+
+            submitBtn.text('修改');
+            B.hideSearchPanel(editPanel);
+            titleInput.focus();
         }
     };
 
