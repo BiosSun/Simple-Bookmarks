@@ -165,7 +165,7 @@
     var
     bmItemTitleKeyDownHandlers = {
         // up
-        38: function(item, $item, $title, e) {
+        38: function(item, $item) {
             var allItemEl = bmRootList.find('.bm-item'),
                 selItemElIndex = allItemEl.index($item) - 1;
 
@@ -177,7 +177,7 @@
             }
         },
         // down
-        40: function(item, $item, $title, e) {
+        40: function(item, $item) {
             var allItemEl = bmRootList.find('.bm-item'),
                 selItemElIndex = (allItemEl.index($item) + 1) % allItemEl.length;
 
