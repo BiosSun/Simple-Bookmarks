@@ -191,6 +191,7 @@
             }
             else {
                 selectBMItem(allItemEl.eq(selItemElIndex).data('item'), true);
+                bmRootList.scrollTop(0);
                 searchInput.focus();
             }
         }
@@ -358,7 +359,6 @@
 
         if (less) {
             item.el.addClass('less');
-            bmRootList.scrollTop(item.el.position().top - parseInt(bmRootList.css('padding-top')));
         }
         else if (item.titleEl[0] !== document.activeElement) {
             item.titleEl.focus();
