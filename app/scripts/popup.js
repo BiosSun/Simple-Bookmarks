@@ -14,7 +14,9 @@
 
         // search
         lastSearchText = '',
-        bmRootListCache;
+        bmRootListCache,
+
+        selectedItem;
 
     B.init(function() {
         // 构建默认书签列表
@@ -63,8 +65,7 @@
 
         // 绑定即时搜索相关事件
         searchInput.on('keyup', function() {
-            var input = $(this);
-            searchItems(input.val());
+            searchItems($(this).val());
         });
 
         // 处理全局按键事件
@@ -129,12 +130,88 @@
 
         // 使用 tab 键在列表中选择书签条目
         bmRootList.on('focus', '.bm-item-title', function() {
-            var itemEl = $(this).closest('.bm-item'),
-                item = itemEl.data('item');
-
+            var item = $(this).closest('.bm-item').data('item');
             selectBMItem(item);
         });
+
+        // 使用方向键在搜索框及列表间选择条目
+        searchInput
+            .on('focus', function() {
+                selectBMItem(selectedItem, true);
+            })
+            .on('keydown', function(e) {
+                var handler = searchInputKeyDownHandlers[e.keyCode];
+                if (handler) { handler(); }
+            });
     });
+
+    bmRootList.on('keydown', '.bm-item-title', function(e) {
+        var handler = bmItemTitleKeyDownHandlers[e.keyCode],
+            $title, $item, item;
+
+        if (handler) {
+            $title = $(this);
+            $item = $title.closest('.bm-item');
+            item = $item.data('item');
+
+            handler(item, $item, $title, e);
+            return false;
+        }
+        else {
+            return undefined;
+        }
+    });
+
+    var
+    bmItemTitleKeyDownHandlers = {
+        // up
+        38: function(item, $item, $title, e) {
+            var allItemEl = bmRootList.find('.bm-item'),
+                selItemElIndex = allItemEl.index($item) - 1;
+
+            if (selItemElIndex !== -1) {
+                selectBMItem(allItemEl.eq(selItemElIndex).data('item'));
+            }
+            else {
+                searchInput.focus();
+            }
+        },
+        // down
+        40: function(item, $item, $title, e) {
+            var allItemEl = bmRootList.find('.bm-item'),
+                selItemElIndex = (allItemEl.index($item) + 1) % allItemEl.length;
+
+            if (selItemElIndex !== 0) {
+                selectBMItem(allItemEl.eq(selItemElIndex).data('item'));
+            }
+            else {
+                selectBMItem(allItemEl.eq(selItemElIndex).data('item'), true);
+                searchInput.focus();
+            }
+        }
+    },
+
+    searchInputKeyDownHandlers = {
+        // up
+        38: function() {
+            var $allItems = bmRootList.find('.bm-item'),
+                $item;
+
+            // 如果当前有选中条目，则选择该选中项的上一个条目。
+            if (selectedItem && selectedItem.el.is(':visible')) {
+                $item = $allItems.eq($allItems.index(selectedItem.el) - 1);
+            }
+            else {
+                $item = $allItems.last();
+            }
+
+            selectBMItem($item.data('item'));
+        },
+        // down
+        40: function() {
+            selectBMItem(selectedItem);
+        }
+    };
 
     function contextMenuDisabled(key, options) {
         var item = options.$trigger.closest('.bm-item').data('item');
@@ -242,11 +319,47 @@
         lastSearchText = searchText;
     }
 
-    // 选中一个条目
+    /**
+     * 选中一个条目
+     *
+     * @param item! {Object} {当前列表中的第一个条目} 需要选中的条目。
+     *
+     * @param less! {Boolean} {false}
+     *     是否是静默选中，当为静默选中时，在将元素标记为选中状态的同时，
+     *     也会标识一个静默状态，同时不会将让该条目取得焦点。
+     *     如果要取消静默状态，只要重新选中该条目即可。
+     */
     function selectBMItem(item, less) {
-        var nowSelectedItemEl = bmRootList.find('.bm-item.selected');
-        nowSelectedItemEl.removeClass('selected less');
-        item.el.addClass('selected' + (less ? ' less' : ''));
+        // if not give item, the item default is first item in bookmark list.
+        if ( typeof item === 'boolean' ) {
+            less = item;
+            item = undefined;
+        }
+
+        // if item is undefined, is not give item.
+        if (item === undefined) {
+            item = bmRootList.find('.bm-item:first').data('item');
+        }
+        // if give item, but item is null, is error, quit function.
+        else if ( item === null ) {
+            return;
+        }
+
+        if (selectedItem) {
+            selectedItem.el.removeClass('selected less');
+        }
+
+        item.el.addClass('selected');
+
+        if (less) {
+            item.el.addClass('less');
+            bmRootList.scrollTop(item.el.position().top - parseInt(bmRootList.css('padding-top')));
+        }
+        else if (item.titleEl[0] !== document.activeElement) {
+            item.titleEl.focus();
+        }
+
+        selectedItem = item;
     }
 
     // 切换一个书签目录项的打开与关闭状态
@@ -347,6 +460,7 @@
 
         // 创建双向绑定
         item.el.data('item', item);
+        item.titleEl = item.el.find('> .bm-item-title');
 
         return item;
     }
@@ -377,7 +491,7 @@
     function fillBMDirectoryItem(item) {
         item.sublistEl = $('<ul class="bm-sublist" style="display:none"></ul>');
         item.el.addClass('bm-item-directory').append(
-            '<span class="bm-item-title">' +
+            '<span class="bm-item-title" tabindex="0">' +
                 '<i class="bm-item-favicon"></i>' +
                 '<span class="text"></span>' +
             '</span>',
@@ -393,7 +507,7 @@
 
     function fillBMBookmarkItem(item) {
         item.el.addClass('bm-item-bookmark').append(
-            '<a class="bm-item-title">' +
+            '<a class="bm-item-title" tabindex="0">' +
                 '<i class="bm-item-favicon">' +
                     '<img />' +
                 '</i>' +
@@ -415,7 +529,7 @@
 
     function fillBMSeparatorItem(item) {
         item.el.addClass('bm-item-separator').append(
-            '<span class="bm-item-title">' +
+            '<span class="bm-item-title" tabindex="0">' +
                 '<span class="line-l"></span>' +
                 '<span class="text"></span>' +
                 '<span class="line-r"></span>' +
