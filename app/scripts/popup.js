@@ -129,16 +129,20 @@
         });
 
         // 使用 tab 键在列表中选择书签条目
-        bmRootList.on('focus', '.bm-item-title', function() {
-            var item = $(this).closest('.bm-item').data('item');
-            selectBMItem(item);
-        });
+        bmRootList
+            .on('focus', '.bm-item-title', function() {
+                var item = $(this).closest('.bm-item').data('item');
+                selectBMItem(item);
+            })
+            // 如果焦点被列表外的元素捕获，则设置所有选择状态为 less 状态
+            .on('focusout', function() {
+                if (!$.contains(this, document.activeElement)) {
+                    selectBMItem(selectedItem, true);
+                }
+            });
 
         // 使用方向键在搜索框及列表间选择条目
         searchInput
-            .on('focus', function() {
-                selectBMItem(selectedItem, true);
-            })
             .on('keydown', function(e) {
                 var handler = searchInputKeyDownHandlers[e.keyCode];
                 if (handler) { handler(); return false; }
