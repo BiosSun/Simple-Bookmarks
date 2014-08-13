@@ -3,9 +3,10 @@
 
     var doc = $(document),
 
-        BM_ITEM_TYPE_DIRECTORY = 1,
-        BM_ITEM_TYPE_BOOKMARK = 2,
-        BM_ITEM_TYPE_SEPARATOR = 3,
+        BM_ITEM_TYPE_DIRECTORY = 1,   // 书签目录
+        BM_ITEM_TYPE_BOOKMARK  = 2,   // 分隔符书签
+        BM_ITEM_TYPE_SEPARATOR = 3,   // 普通书签
+        BM_ITEM_TYPE_HISTORY   = 4,   // 历史记录
 
         STORAGE_KEY_IS_OPEN = '1',
 
@@ -21,7 +22,18 @@
     B.init(function() {
         // 构建默认书签列表
         B.getChildren(B.rootFolderId, function(nodes) {
-            var i, l, item, node;
+            var now = new Date(),
+                item, node, historyFolderNode, i, l;
+
+            historyFolderNode = {
+                id: -1,
+                parentId: nodes[0].parentId,
+                index: nodes[nodes.length - 1].index + 1,
+                title: '浏览记录'
+            };
+
+            nodes.push(historyFolderNode);
+
             for (i = 0, l = nodes.length; i < l; i++) {
                 node = nodes[i];
                 item = createBMItem(node);
@@ -31,6 +43,29 @@
                     openBMItem(item, false);
                 }
             }
+
+            // 获取 2 天以内的最多 3000 条浏览记录
+            chrome.history.search({
+                text: '',
+                startTime: now - 1000 * 60 * 60 * 24 * 2,
+                endTime: now.getTime(),
+                maxResults: 3000
+            }, function(historys) {
+                var $folderItem = bmRootList.find('#bmitem-' + historyFolderNode.id),
+                    folderItem = $folderItem.data('item'),
+                    node, item, i, l;
+
+                console.info(historys);
+
+                for (i = 0, l = historys.length; i < l; i++) {
+                    node = $.extend({}, historys[i]);
+                    node.id = -node.id - 1;
+                    node.isHistory = true;
+
+                    item = createBMItem(node);
+                    folderItem.sublistEl.append(item.el);
+                }
+            });
         });
 
         // 绑定书签项的点击事件
@@ -389,26 +424,38 @@
 
 
         // 插入子书签项
-        B.getChildren(item.id, function(subnodes) {
-            var subitem, subnode, i, l;
+        if (item.id >= 0) {
+            B.getChildren(item.id, function(subnodes) {
+                if (!subnodes) { return; }
 
-            for (i = 0, l = subnodes.length; i < l; i++) {
-                subnode = subnodes[i];
-                subitem = createBMItem(subnode);
-                item.sublistEl.append(subitem.el);
+                var subitem, subnode, i, l;
 
-                if (subitem.isOpen) {
-                    openBMItem(subitem, animate);
+                for (i = 0, l = subnodes.length; i < l; i++) {
+                    subnode = subnodes[i];
+                    subitem = createBMItem(subnode);
+                    item.sublistEl.append(subitem.el);
+
+                    if (subitem.isOpen) {
+                        openBMItem(subitem, animate);
+                    }
                 }
-            }
 
+                if (animate !== false) {
+                    item.sublistEl.slideDown();
+                }
+                else {
+                    item.sublistEl.show();
+                }
+            });
+        }
+        else {
             if (animate !== false) {
                 item.sublistEl.slideDown();
             }
             else {
                 item.sublistEl.show();
             }
-        });
+        }
 
     }
 
@@ -418,7 +465,9 @@
         item.el.removeClass('open');
 
         item.sublistEl.slideUp(function() {
-            item.sublistEl.empty();
+            if (item.id >= 0) {
+                item.sublistEl.empty();
+            }
         });
 
         item.el.add(item.el.find('.bm-item.open')).map(function() {
@@ -441,7 +490,7 @@
                    ' data-index="' + node.index + '">' +
                 '</li>'
             ),
-            isOpen: B.storage(node.id + '-' + STORAGE_KEY_IS_OPEN)
+            isOpen:  node.isOpen || B.storage(node.id + '-' + STORAGE_KEY_IS_OPEN)
         };
 
         // bookmark
@@ -450,6 +499,11 @@
             if (node.isSeparatorBookmark) {
                 fillBMSeparatorItem(item);
                 item.type = BM_ITEM_TYPE_SEPARATOR;
+            }
+            // history bookmark
+            else if (node.isHistory) {
+                fillBMHistoryItem(item);
+                item.type = BM_ITEM_TYPE_HISTORY;
             }
             // common bookmark
             else {
@@ -481,6 +535,10 @@
             // separator bookmark
             if (item.data.isSeparatorBookmark) {
                 updateBMSeparatorItem(item);
+            }
+            // history bookmark
+            else if (item.data.isHistory) {
+                updateBMHistoryItem(item);
             }
             // common bookmark
             else {
@@ -530,6 +588,32 @@
         item.el.find('.bm-item-title').toggleClass('isurl', !title).attr('href', url)
                .find('.text').text(title || url).end()
                .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url);
+    }
+
+    function fillBMHistoryItem(item) {
+        item.el.addClass('bm-item-history').append(
+            '<a class="bm-item-title" tabindex="0">' +
+                '<span class="last-visit-time"></span>' +
+                '<span class="visit-count"></span>' +
+                '<i class="bm-item-favicon">' +
+                    '<img />' +
+                '</i>' +
+                '<span class="text"></span>' +
+            '</a>'
+        );
+
+        updateBMHistoryItem(item);
+    }
+
+    function updateBMHistoryItem(item) {
+        var title = item.data.title,
+            url = item.data.url;
+
+        item.el.find('.bm-item-title').toggleClass('isurl', !title).attr('href', url)
+               .find('.text').text(title || url).end()
+               .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url).end()
+               .find('.last-visit-time').text(moment(item.data.lastVisitTime).format('YYYY-MM-DD')).end()
+               .find('.visit-count').text(item.data.visitCount);
     }
 
     function fillBMSeparatorItem(item) {
