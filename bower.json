@@ -7,6 +7,7 @@
   },
   "devDependencies": {
     "jquery-ui": "~1.11.0",
-    "jQuery-contextMenu": "~1.6.6"
+    "jQuery-contextMenu": "~1.6.6",
+    "moment": "~2.8.1"
   }
 }
