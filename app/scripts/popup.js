@@ -141,7 +141,8 @@
             })
             .on('keydown', function(e) {
                 var handler = searchInputKeyDownHandlers[e.keyCode];
-                if (handler) { handler(); }
+                if (handler) { handler(); return false; }
+                else { return undefined; }
             });
     });
 
