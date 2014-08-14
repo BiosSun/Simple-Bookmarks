@@ -95,7 +95,7 @@
 
         // 绑定即时搜索相关事件
         searchInput.on('keyup', function() {
-            searchItems($(this).val());
+            search($(this).val());
         });
 
         // 处理全局按键事件
@@ -262,19 +262,7 @@
         }
     };
 
-    function contextMenuDisabled(key, options) {
-        var item = options.$trigger.closest('.bm-item').data('item');
-
-        if ( key === 'edit' || key === 'remove' ) {
-            if ( item.data.parentId === B.rootFolderId ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    // 处理右键菜单点击事件
+    // 统一处理右键菜单的点击事件
     function contextMenuHandler(key, options) {
         var item = options.$trigger.closest('.bm-item').data('item');
 
@@ -314,6 +302,19 @@
         }
     }
 
+    // 统一处理右键菜单项的禁用检查
+    function contextMenuDisabled(key, options) {
+        var item = options.$trigger.closest('.bm-item').data('item');
+
+        if ( key === 'edit' || key === 'remove' ) {
+            if ( item.data.parentId === B.rootFolderId ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // 使用某种方式打开指定的书签目录内的所有子书签
     function openChildrens(id, openMode, openOperation) {
         B.getChildrenUrls(id, function(urls) {
@@ -325,8 +326,8 @@
         });
     }
 
-    // 根据一个字符串查询书签项
-    function searchItems(searchText) {
+    // 根据一个字符串查询书签项和历史记录
+    function search(searchText) {
         var isFirstMatching = true;
 
         searchText = $.trim(searchText).toLowerCase();
