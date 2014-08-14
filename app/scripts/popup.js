@@ -22,8 +22,7 @@
     B.init(function() {
         // 构建默认书签列表
         B.getChildren(B.rootFolderId, function(nodes) {
-            var now = new Date(),
-                item, node, historyFolderNode, i, l;
+            var item, node, historyFolderNode, i, l;
 
             historyFolderNode = {
                 id: -1,
@@ -44,18 +43,14 @@
                 }
             }
 
-            // 获取 2 天以内的最多 3000 条浏览记录
+            // 获取最近的最多 100 条浏览记录
             chrome.history.search({
                 text: '',
-                startTime: now - 1000 * 60 * 60 * 24 * 2,
-                endTime: now.getTime(),
-                maxResults: 3000
+                maxResults: 100
             }, function(historys) {
                 var $folderItem = bmRootList.find('#bmitem-' + historyFolderNode.id),
                     folderItem = $folderItem.data('item'),
                     node, item, i, l;
-
-                console.info(historys);
 
                 for (i = 0, l = historys.length; i < l; i++) {
                     node = $.extend({}, historys[i]);
