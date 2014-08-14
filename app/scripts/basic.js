@@ -56,6 +56,13 @@
             return node;
         },
 
+        createHistoryNode: function(HistoryItem) {
+            var node = $.extend({}, HistoryItem);
+            node.id = -node.id - B.historyNodeIdOffset;
+            node.isHistory = true;
+            return node;
+        },
+
         // 恢复对节点对象的扩展的内容
         unextendNode: function(node) {
             node = $.extend({}, node);

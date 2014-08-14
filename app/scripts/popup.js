@@ -53,10 +53,7 @@
                     node, item, i, l;
 
                 for (i = 0, l = historys.length; i < l; i++) {
-                    node = $.extend({}, historys[i]);
-                    node.id = -node.id - B.historyNodeIdOffset;
-                    node.isHistory = true;
-
+                    node = B.createHistoryNode(historys[i]);
                     item = createItem(node);
                     folderItem.sublistEl.append(item.el);
                 }
@@ -352,13 +349,49 @@
 
         // 包含查询文字时，开始进行查询
         if (searchText) {
+            // 插入查询书签结果目录和查询浏览记录结果目录这两个虚拟目录
+            var searchBookmarkFolderItem = createItem({
+                    id: B.searchBookmarkFolderId,
+                    title: '书签'
+                }),
+                searchHistoryFolderItem = createItem({
+                    id: B.searchBookmarkFolderId,
+                    title: '浏览记录'
+                });
+
+            bmRootList.append(searchBookmarkFolderItem.el, searchHistoryFolderItem.el);
+            openItem(searchBookmarkFolderItem, false);
+            openItem(searchHistoryFolderItem, false);
+
+            // 检索书签
             B.traversalBookmarks(function(node) {
                 if ( node.url && !node.isSeparatorBookmark ) {  // is bookmark node
                     var item;
 
                     if ( B.isMatching(node, searchText) ) {
                         item = createItem(node);
-                        bmRootList.append(item.el);
+                        searchBookmarkFolderItem.sublistEl.append(item.el);
+
+                        if ( isFirstMatching ) {
+                            selectItem(item, true);
+                            isFirstMatching = false;
+                        }
+                    }
+                }
+            });
+
+            // 检索历史记录
+            chrome.history.search({
+                text: '',
+                maxResults: 3000
+            }, function(historys) {
+                var node, item, i, l;
+
+                for (i = 0, l = historys.length; i < l; i++) {
+                    node = B.createHistoryNode(historys[i]);
+                    if ( B.isMatching(node, searchText) ) {
+                        item = createItem(node);
+                        searchHistoryFolderItem.sublistEl.append(item.el);
 
                         if ( isFirstMatching ) {
                             selectItem(item, true);
