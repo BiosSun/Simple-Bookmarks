@@ -235,7 +235,6 @@
             }
         }
     },
-
     searchInputKeyUpHandlers = {
         // 在敲击回车键时，打开当前列表中被选中的条目
         13: function() {
@@ -249,7 +248,6 @@
             }
         }
     },
-
     searchInputKeyDownHandlers = {
         // up
         38: function() {
