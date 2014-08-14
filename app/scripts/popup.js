@@ -143,6 +143,19 @@
             }
         });
         $.contextMenu({
+            selector: '.bm-item-history .bm-item-title',
+            callback: contextMenuHandler,
+            items: {
+                open: { name: '打开链接' },
+                openInNewTab : { name: '在新标签页中打开链接' },
+                openInNewWindow : { name: '在新窗口中打开链接' },
+                openInStealthWindow : { name: '在隐身窗口中打开链接' },
+                sep1 : '----------',
+                edit : { name: '编辑', disabled: true },
+                remove : { name: '删除', disabled: true }
+            }
+        });
+        $.contextMenu({
             selector: '.bm-item-separator .bm-item-title',
             callback: contextMenuHandler,
             items: {
