@@ -548,24 +548,23 @@
             // separator bookmark
             if (node.isSeparatorBookmark) {
                 fillSeparatorItem(item);
-                item.type = BM_ITEM_TYPE_SEPARATOR;
             }
             // history bookmark
             else if (node.isHistory) {
                 fillHistoryItem(item);
-                item.type = BM_ITEM_TYPE_HISTORY;
             }
             // common bookmark
             else {
                 fillBookmarkItem(item);
-                item.type = BM_ITEM_TYPE_BOOKMARK;
             }
         }
         // folder
         else {
             fillDirectoryItem(item);
-            item.type = BM_ITEM_TYPE_DIRECTORY;
         }
+
+        // 在元素中添加条目类型属性
+        item.el.attr('data-type', item.type);
 
         // 创建双向绑定
         item.el.data('item', item);
@@ -602,6 +601,7 @@
     }
 
     function fillDirectoryItem(item) {
+        item.type = BM_ITEM_TYPE_DIRECTORY;
         item.sublistEl = $('<ul class="bm-sublist" style="display:none"></ul>');
         item.el.addClass('bm-item-directory').append(
             '<span class="bm-item-title" tabindex="0">' +
@@ -619,6 +619,7 @@
     }
 
     function fillBookmarkItem(item) {
+        item.type = BM_ITEM_TYPE_SEPARATOR;
         item.el.addClass('bm-item-bookmark').append(
             '<a class="bm-item-title" tabindex="0">' +
                 '<i class="bm-item-favicon">' +
@@ -641,6 +642,7 @@
     }
 
     function fillHistoryItem(item) {
+        item.type = BM_ITEM_TYPE_HISTORY;
         item.el.addClass('bm-item-history').append(
             '<a class="bm-item-title" tabindex="0">' +
                 '<span class="last-visit-time"></span>' +
@@ -667,6 +669,7 @@
     }
 
     function fillSeparatorItem(item) {
+        item.type = BM_ITEM_TYPE_BOOKMARK;
         item.el.addClass('bm-item-separator').append(
             '<span class="bm-item-title" tabindex="0">' +
                 '<span class="line-l"></span>' +
