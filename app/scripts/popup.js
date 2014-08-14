@@ -5,6 +5,8 @@
 
         STORAGE_KEY_IS_OPEN = '1',
 
+        ANIMATE_TIME = 150,
+
         bmRootList = $('#bookmarks'),
         searchInput = $('#search'),
 
@@ -573,7 +575,7 @@
                     }
 
                     if (animate !== false) {
-                        self.sublistEl.slideDown();
+                        self.sublistEl.slideDown(ANIMATE_TIME);
                     }
                     else {
                         self.sublistEl.show();
@@ -582,7 +584,7 @@
             }
             else {
                 if (animate !== false) {
-                    self.sublistEl.slideDown();
+                    self.sublistEl.slideDown(ANIMATE_TIME);
                 }
                 else {
                     self.sublistEl.show();
@@ -596,7 +598,7 @@
             self.isOpen = false;
             self.el.removeClass('open');
 
-            self.sublistEl.slideUp(function() {
+            self.sublistEl.slideUp(ANIMATE_TIME, function() {
                 if (self.id >= 0) {
                     self.sublistEl.empty();
                 }
