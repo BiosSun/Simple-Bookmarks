@@ -124,8 +124,8 @@
             }
         });
 
-        // 使用 tab 键在列表中选择书签条目
         bmRootList
+            // 使用 tab 键在列表中选择书签条目
             .on('focus', '.bm-item-title', function() {
                 var item = $(this).closest('.bm-item').data('item');
                 selectItem(item);
@@ -135,7 +135,10 @@
                 if (!$.contains(this, document.activeElement)) {
                     selectItem(selectedItem, true);
                 }
-            });
+            })
+            // 键盘控制
+            .on('keydown', '.bm-item-title', $.proxy(bmItemKeyEventsHandler, null, bmItemTitleKeyDownHandlers))
+            .on('keyup', '.bm-item-title', $.proxy(bmItemKeyEventsHandler, null, bmItemTitleKeyUpHandlers));
 
         // 使用方向键在搜索框及列表间选择条目
         searchInput
@@ -151,12 +154,14 @@
             });
     });
 
-    bmRootList.on('keydown', '.bm-item-title', function(e) {
-        var handler = bmItemTitleKeyDownHandlers[e.keyCode],
+    var
+
+    bmItemKeyEventsHandler = function(handlers, e) {
+        var handler = handlers[e.keyCode],
             $title, $item, item;
 
         if (handler) {
-            $title = $(this);
+            $title = $(e.target);
             $item = $title.closest('.bm-item');
             item = $item.data('item');
 
@@ -166,10 +171,13 @@
         else {
             return undefined;
         }
-    });
+    },
 
-    var
-
+    bmItemTitleKeyUpHandlers = {
+        13: function(item, $item, $title, e) {
+            item.toggle([e]);
+        }
+    },
     bmItemTitleKeyDownHandlers = {
         // up
         38: function(item, $item) {
@@ -199,9 +207,8 @@
         }
     },
     searchInputKeyUpHandlers = {
-        // 在敲击回车键时，打开当前列表中被选中的条目
+        // 在敲击回车键时，打开当前列表中被选中的书签条目或历史记录条目
         13: function() {
-            // TODO: 目前只支持打开 1 个书签条目或历史记录条目
             if ( selectedItem &&
                  ( selectedItem.type === BookmarkItem.TYPE_ID ||
                    selectedItem.type === HistoryItem.TYPE_ID ) &&
