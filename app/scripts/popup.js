@@ -111,15 +111,6 @@
 
                     $('#search').focus();
                     break;
-                case 13:
-                    var selectedItemEl = bmRootList.find('.bm-item.selected'),
-                        selectedItem = selectedItemEl.data('item');
-
-                    // TODO: 目前只支持打开 1 个选择条目
-                    if ( selectedItem.type === BM_ITEM_TYPE_BOOKMARK ) {
-                        B.openUrlInCurrentTab(selectedItem.data.url, true);
-                    }
-                    break;
             }
         });
 
@@ -186,6 +177,11 @@
 
         // 使用方向键在搜索框及列表间选择条目
         searchInput
+            .on('keyup', function(e) {
+                var handler = searchInputKeyUpHandlers[e.keyCode];
+                if (handler) { handler(); return false; }
+                else { return undefined; }
+            })
             .on('keydown', function(e) {
                 var handler = searchInputKeyDownHandlers[e.keyCode];
                 if (handler) { handler(); return false; }
@@ -236,6 +232,20 @@
                 selectItem(allItemEl.eq(selItemElIndex).data('item'), true);
                 bmRootList.scrollTop(0);
                 searchInput.focus();
+            }
+        }
+    },
+
+    searchInputKeyUpHandlers = {
+        // 在敲击回车键时，打开当前列表中被选中的条目
+        13: function() {
+            // TODO: 目前只支持打开 1 个书签条目或历史记录条目
+            if ( selectedItem &&
+                 ( selectedItem.type === BM_ITEM_TYPE_BOOKMARK ||
+                   selectedItem.type === BM_ITEM_TYPE_HISTORY ) &&
+                 selectedItem.el.is(':visible')
+               ) {
+                B.openUrlInCurrentTab(selectedItem.data.url, true);
             }
         }
     },
