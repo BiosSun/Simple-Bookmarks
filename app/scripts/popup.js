@@ -25,7 +25,7 @@
             var item, node, historyFolderNode, i, l;
 
             historyFolderNode = {
-                id: -1,
+                id: B.historyFolderId,
                 parentId: nodes[0].parentId,
                 index: nodes[nodes.length - 1].index + 1,
                 title: '浏览记录'
@@ -54,7 +54,7 @@
 
                 for (i = 0, l = historys.length; i < l; i++) {
                     node = $.extend({}, historys[i]);
-                    node.id = -node.id - 1;
+                    node.id = -node.id - B.historyNodeIdOffset;
                     node.isHistory = true;
 
                     item = createItem(node);

@@ -13,6 +13,17 @@
     B = {
         // 根书签目录节点的 ID
         rootFolderId: '0',
+        // 浏览历史目录（虚拟）节点的 ID
+        historyFolderId: '-1',
+
+        // 查询书签结果目录（虚拟）节点的 ID
+        searchBookmarkFolderId: '-2',
+
+        // 查询浏览记录结果目录（虚拟）节点的 ID
+        searchHistoryFolderId: '-3',
+
+        // 历史记录条目节点 ID 的偏移值
+        historyNodeIdOffset: 10,
 
         defSeparator: '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ',
 
