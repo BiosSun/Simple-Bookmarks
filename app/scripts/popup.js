@@ -81,7 +81,7 @@
             if (itemEl.hasClass('bm-item-directory')) {
                 toggleBMItem(item);
             }
-            else if (itemEl.hasClass('bm-item-bookmark')) {
+            else if (itemEl.hasClass('bm-item-bookmark') || itemEl.hasClass('bm-item-history')) {
                 url = item.data.url;
 
                 if (isCtrlMeta) {
