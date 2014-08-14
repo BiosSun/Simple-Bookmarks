@@ -619,7 +619,7 @@
     }
 
     function fillBookmarkItem(item) {
-        item.type = BM_ITEM_TYPE_SEPARATOR;
+        item.type = BM_ITEM_TYPE_BOOKMARK;
         item.el.addClass('bm-item-bookmark').append(
             '<a class="bm-item-title" tabindex="0">' +
                 '<i class="bm-item-favicon">' +
@@ -669,7 +669,7 @@
     }
 
     function fillSeparatorItem(item) {
-        item.type = BM_ITEM_TYPE_BOOKMARK;
+        item.type = BM_ITEM_TYPE_SEPARATOR;
         item.el.addClass('bm-item-separator').append(
             '<span class="bm-item-title" tabindex="0">' +
                 '<span class="line-l"></span>' +
