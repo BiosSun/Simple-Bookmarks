@@ -35,11 +35,11 @@
 
             for (i = 0, l = nodes.length; i < l; i++) {
                 node = nodes[i];
-                item = createBMItem(node);
+                item = createItem(node);
                 bmRootList.append(item.el);
 
                 if (item.isOpen) {
-                    openBMItem(item, false);
+                    openItem(item, false);
                 }
             }
 
@@ -57,7 +57,7 @@
                     node.id = -node.id - 1;
                     node.isHistory = true;
 
-                    item = createBMItem(node);
+                    item = createItem(node);
                     folderItem.sublistEl.append(item.el);
                 }
             });
@@ -74,7 +74,7 @@
                 url;
 
             if (itemEl.hasClass('bm-item-directory')) {
-                toggleBMItem(item);
+                toggleItem(item);
             }
             else if (itemEl.hasClass('bm-item-bookmark') || itemEl.hasClass('bm-item-history')) {
                 url = item.data.url;
@@ -175,12 +175,12 @@
         bmRootList
             .on('focus', '.bm-item-title', function() {
                 var item = $(this).closest('.bm-item').data('item');
-                selectBMItem(item);
+                selectItem(item);
             })
             // 如果焦点被列表外的元素捕获，则设置所有选择状态为 less 状态
             .on('focusout', function() {
                 if (!$.contains(this, document.activeElement)) {
-                    selectBMItem(selectedItem, true);
+                    selectItem(selectedItem, true);
                 }
             });
 
@@ -218,7 +218,7 @@
                 selItemElIndex = allItemEl.index($item) - 1;
 
             if (selItemElIndex !== -1) {
-                selectBMItem(allItemEl.eq(selItemElIndex).data('item'));
+                selectItem(allItemEl.eq(selItemElIndex).data('item'));
             }
             else {
                 searchInput.focus();
@@ -230,10 +230,10 @@
                 selItemElIndex = (allItemEl.index($item) + 1) % allItemEl.length;
 
             if (selItemElIndex !== 0) {
-                selectBMItem(allItemEl.eq(selItemElIndex).data('item'));
+                selectItem(allItemEl.eq(selItemElIndex).data('item'));
             }
             else {
-                selectBMItem(allItemEl.eq(selItemElIndex).data('item'), true);
+                selectItem(allItemEl.eq(selItemElIndex).data('item'), true);
                 bmRootList.scrollTop(0);
                 searchInput.focus();
             }
@@ -254,11 +254,11 @@
                 $item = $allItems.last();
             }
 
-            selectBMItem($item.data('item'));
+            selectItem($item.data('item'));
         },
         // down
         40: function() {
-            selectBMItem(selectedItem);
+            selectItem(selectedItem);
         }
     };
 
@@ -308,7 +308,7 @@
             case 'edit' :
                 B.edit(item.data, function() {
                     // update el data
-                    updateBMItem(item);
+                    updateItem(item);
                 });
                 break;
         }
@@ -348,11 +348,11 @@
                     var item;
 
                     if ( B.isMatching(node, searchText) ) {
-                        item = createBMItem(node);
+                        item = createItem(node);
                         bmRootList.append(item.el);
 
                         if ( isFirstMatching ) {
-                            selectBMItem(item, true);
+                            selectItem(item, true);
                             isFirstMatching = false;
                         }
                     }
@@ -378,7 +378,7 @@
      *     也会标识一个静默状态，同时不会将让该条目取得焦点。
      *     如果要取消静默状态，只要重新选中该条目即可。
      */
-    function selectBMItem(item, less) {
+    function selectItem(item, less) {
         // if not give item, the item default is first item in bookmark list.
         if ( typeof item === 'boolean' ) {
             less = item;
@@ -411,17 +411,17 @@
     }
 
     // 切换一个书签目录项的打开与关闭状态
-    function toggleBMItem(item, sw) {
+    function toggleItem(item, sw) {
         if (sw || !item.isOpen) {
-            openBMItem(item);
+            openItem(item);
         }
         else {
-            closeBMItem(item);
+            closeItem(item);
         }
     }
 
     // 打开一个书签目录项
-    function openBMItem(item, animate) {
+    function openItem(item, animate) {
         item.isOpen = true;
         item.el.addClass('open');
 
@@ -440,11 +440,11 @@
 
                 for (i = 0, l = subnodes.length; i < l; i++) {
                     subnode = subnodes[i];
-                    subitem = createBMItem(subnode);
+                    subitem = createItem(subnode);
                     item.sublistEl.append(subitem.el);
 
                     if (subitem.isOpen) {
-                        openBMItem(subitem, animate);
+                        openItem(subitem, animate);
                     }
                 }
 
@@ -468,7 +468,7 @@
     }
 
     // 关闭一个书签目录项
-    function closeBMItem(item) {
+    function closeItem(item) {
         item.isOpen = false;
         item.el.removeClass('open');
 
@@ -488,7 +488,7 @@
     /**
      * 创建并注册一个书签项，如果该书签项已被创建，则不再重新创建，而是返回已有的。
      */
-    function createBMItem(node) {
+    function createItem(node) {
         var item = {
             id: node.id,
             data: node,
@@ -505,23 +505,23 @@
         if (node.url) {
             // separator bookmark
             if (node.isSeparatorBookmark) {
-                fillBMSeparatorItem(item);
+                fillSeparatorItem(item);
                 item.type = BM_ITEM_TYPE_SEPARATOR;
             }
             // history bookmark
             else if (node.isHistory) {
-                fillBMHistoryItem(item);
+                fillHistoryItem(item);
                 item.type = BM_ITEM_TYPE_HISTORY;
             }
             // common bookmark
             else {
-                fillBMBookmarkItem(item);
+                fillBookmarkItem(item);
                 item.type = BM_ITEM_TYPE_BOOKMARK;
             }
         }
         // folder
         else {
-            fillBMDirectoryItem(item);
+            fillDirectoryItem(item);
             item.type = BM_ITEM_TYPE_DIRECTORY;
         }
 
@@ -535,31 +535,31 @@
     /**
      *  根据节点数据更新 Item 的显示内容
      */
-    function updateBMItem(item) {
+    function updateItem(item) {
         item.el.attr('data-index', item.data.index);
 
         // bookmark
         if (item.data.url) {
             // separator bookmark
             if (item.data.isSeparatorBookmark) {
-                updateBMSeparatorItem(item);
+                updateSeparatorItem(item);
             }
             // history bookmark
             else if (item.data.isHistory) {
-                updateBMHistoryItem(item);
+                updateHistoryItem(item);
             }
             // common bookmark
             else {
-                updateBMBookmarkItem(item);
+                updateBookmarkItem(item);
             }
         }
         // folder
         else {
-            updateBMDirectoryItem(item);
+            updateDirectoryItem(item);
         }
     }
 
-    function fillBMDirectoryItem(item) {
+    function fillDirectoryItem(item) {
         item.sublistEl = $('<ul class="bm-sublist" style="display:none"></ul>');
         item.el.addClass('bm-item-directory').append(
             '<span class="bm-item-title" tabindex="0">' +
@@ -569,14 +569,14 @@
             item.sublistEl
         );
 
-        updateBMDirectoryItem(item);
+        updateDirectoryItem(item);
     }
 
-    function updateBMDirectoryItem(item) {
+    function updateDirectoryItem(item) {
         item.el.find('.bm-item-title .text').text(item.data.title);
     }
 
-    function fillBMBookmarkItem(item) {
+    function fillBookmarkItem(item) {
         item.el.addClass('bm-item-bookmark').append(
             '<a class="bm-item-title" tabindex="0">' +
                 '<i class="bm-item-favicon">' +
@@ -586,10 +586,10 @@
             '</a>'
         );
 
-        updateBMBookmarkItem(item);
+        updateBookmarkItem(item);
     }
 
-    function updateBMBookmarkItem(item) {
+    function updateBookmarkItem(item) {
         var title = item.data.title,
             url = item.data.url;
 
@@ -598,7 +598,7 @@
                .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url);
     }
 
-    function fillBMHistoryItem(item) {
+    function fillHistoryItem(item) {
         item.el.addClass('bm-item-history').append(
             '<a class="bm-item-title" tabindex="0">' +
                 '<span class="last-visit-time"></span>' +
@@ -610,10 +610,10 @@
             '</a>'
         );
 
-        updateBMHistoryItem(item);
+        updateHistoryItem(item);
     }
 
-    function updateBMHistoryItem(item) {
+    function updateHistoryItem(item) {
         var title = item.data.title,
             url = item.data.url;
 
@@ -624,7 +624,7 @@
                .find('.visit-count').text(item.data.visitCount);
     }
 
-    function fillBMSeparatorItem(item) {
+    function fillSeparatorItem(item) {
         item.el.addClass('bm-item-separator').append(
             '<span class="bm-item-title" tabindex="0">' +
                 '<span class="line-l"></span>' +
@@ -633,10 +633,10 @@
             '</span>'
         );
 
-        updateBMSeparatorItem(item);
+        updateSeparatorItem(item);
     }
 
-    function updateBMSeparatorItem(item) {
+    function updateSeparatorItem(item) {
         var title  = item.data.title;
         item.el.find('.bm-item-title .text').toggleClass('h', !title).text(title);
     }
