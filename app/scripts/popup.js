@@ -3,11 +3,6 @@
 
     var doc = $(document),
 
-        BM_ITEM_TYPE_DIRECTORY = 1,   // 书签目录
-        BM_ITEM_TYPE_BOOKMARK  = 2,   // 分隔符书签
-        BM_ITEM_TYPE_SEPARATOR = 3,   // 普通书签
-        BM_ITEM_TYPE_HISTORY   = 4,   // 历史记录
-
         STORAGE_KEY_IS_OPEN = '1',
 
         bmRootList = $('#bookmarks'),
@@ -22,25 +17,17 @@
     B.init(function() {
         // 构建默认书签列表
         B.getChildren(B.rootFolderId, function(nodes) {
-            var item, node, historyFolderNode, i, l;
+            var historyFolderNode, i, l;
 
             historyFolderNode = {
                 id: B.historyFolderId,
-                parentId: nodes[0].parentId,
-                index: nodes[nodes.length - 1].index + 1,
                 title: '浏览记录'
             };
 
             nodes.push(historyFolderNode);
 
             for (i = 0, l = nodes.length; i < l; i++) {
-                node = nodes[i];
-                item = createItem(node);
-                bmRootList.append(item.el);
-
-                if (item.isOpen) {
-                    openItem(item, false);
-                }
+                createItem(nodes[i], bmRootList);
             }
 
             // 获取最近的最多 100 条浏览记录
@@ -50,12 +37,10 @@
             }, function(historys) {
                 var $folderItem = bmRootList.find('#bmitem-' + historyFolderNode.id),
                     folderItem = $folderItem.data('item'),
-                    node, item, i, l;
+                    i, l;
 
                 for (i = 0, l = historys.length; i < l; i++) {
-                    node = B.createHistoryNode(historys[i]);
-                    item = createItem(node);
-                    folderItem.sublistEl.append(item.el);
+                    createItem(B.createHistoryNode(historys[i]), folderItem);
                 }
             });
         });
@@ -63,29 +48,9 @@
         // 绑定书签项的点击事件
         bmRootList.on('click', '.bm-item-title', function(e) {
             var itemEl = $(this).closest('.bm-item'),
-                item = itemEl.data('item'),
+                item = itemEl.data('item');
 
-                isCtrlMeta = e.ctrlKey || e.metaKey,
-                isShift = e.shiftKey,
-
-                url;
-
-            if (itemEl.hasClass('bm-item-directory')) {
-                toggleItem(item);
-            }
-            else if (itemEl.hasClass('bm-item-bookmark') || itemEl.hasClass('bm-item-history')) {
-                url = item.data.url;
-
-                if (isCtrlMeta) {
-                    B.openUrlInNewTab(url, true);
-                }
-                else if (isShift) {
-                    B.openUrlInNewWindow(url);
-                }
-                else {
-                    B.openUrlInCurrentTab(url, true);
-                }
-            }
+            item.toggle([e]);
 
             return false;
         });
@@ -204,6 +169,7 @@
     });
 
     var
+
     bmItemTitleKeyDownHandlers = {
         // up
         38: function(item, $item) {
@@ -237,8 +203,8 @@
         13: function() {
             // TODO: 目前只支持打开 1 个书签条目或历史记录条目
             if ( selectedItem &&
-                 ( selectedItem.type === BM_ITEM_TYPE_BOOKMARK ||
-                   selectedItem.type === BM_ITEM_TYPE_HISTORY ) &&
+                 ( selectedItem.type === BookmarkItem.TYPE_ID ||
+                   selectedItem.type === HistoryItem.TYPE_ID ) &&
                  selectedItem.el.is(':visible')
                ) {
                 B.openUrlInCurrentTab(selectedItem.data.url, true);
@@ -301,7 +267,7 @@
             case 'edit' :
                 B.edit(item.data, function() {
                     // update el data
-                    updateItem(item);
+                    item.update();
                 });
                 break;
         }
@@ -353,15 +319,14 @@
             var searchBookmarkFolderItem = createItem({
                     id: B.searchBookmarkFolderId,
                     title: '书签'
-                }),
+                }, bmRootList),
                 searchHistoryFolderItem = createItem({
                     id: B.searchBookmarkFolderId,
                     title: '浏览记录'
-                });
+                }, bmRootList);
 
-            bmRootList.append(searchBookmarkFolderItem.el, searchHistoryFolderItem.el);
-            openItem(searchBookmarkFolderItem, false);
-            openItem(searchHistoryFolderItem, false);
+            searchBookmarkFolderItem.open(undefined, false);
+            searchHistoryFolderItem.open(undefined, false);
 
             // 检索书签
             B.traversalBookmarks(function(node) {
@@ -369,8 +334,7 @@
                     var item;
 
                     if ( B.isMatching(node, searchText) ) {
-                        item = createItem(node);
-                        searchBookmarkFolderItem.sublistEl.append(item.el);
+                        item = createItem(node, searchBookmarkFolderItem);
 
                         if ( isFirstMatching ) {
                             selectItem(item, true);
@@ -390,8 +354,7 @@
                 for (i = 0, l = historys.length; i < l; i++) {
                     node = B.createHistoryNode(historys[i]);
                     if ( B.isMatching(node, searchText) ) {
-                        item = createItem(node);
-                        searchHistoryFolderItem.sublistEl.append(item.el);
+                        item = createItem(node, searchHistoryFolderItem);
 
                         if ( isFirstMatching ) {
                             selectItem(item, true);
@@ -436,253 +399,328 @@
             return;
         }
 
-        if (selectedItem) {
-            selectedItem.el.removeClass('selected less');
-        }
-
-        item.el.addClass('selected');
-
-        if (less) {
-            item.el.addClass('less');
-        }
-        else if (item.titleEl[0] !== document.activeElement) {
-            item.titleEl.focus();
-        }
-
-        selectedItem = item;
-    }
-
-    // 切换一个书签目录项的打开与关闭状态
-    function toggleItem(item, sw) {
-        if (sw || !item.isOpen) {
-            openItem(item);
-        }
-        else {
-            closeItem(item);
-        }
-    }
-
-    // 打开一个书签目录项
-    function openItem(item, animate) {
-        item.isOpen = true;
-        item.el.addClass('open');
-
-        // 存储打开状态
-        B.storage(
-            item.id + '-' + STORAGE_KEY_IS_OPEN,
-            true);
-
-
-        // 插入子书签项
-        if (item.id >= 0) {
-            B.getChildren(item.id, function(subnodes) {
-                if (!subnodes) { return; }
-
-                var subitem, subnode, i, l;
-
-                for (i = 0, l = subnodes.length; i < l; i++) {
-                    subnode = subnodes[i];
-                    subitem = createItem(subnode);
-                    item.sublistEl.append(subitem.el);
-
-                    if (subitem.isOpen) {
-                        openItem(subitem, animate);
-                    }
-                }
-
-                if (animate !== false) {
-                    item.sublistEl.slideDown();
-                }
-                else {
-                    item.sublistEl.show();
-                }
-            });
-        }
-        else {
-            if (animate !== false) {
-                item.sublistEl.slideDown();
-            }
-            else {
-                item.sublistEl.show();
-            }
-        }
-
-    }
-
-    // 关闭一个书签目录项
-    function closeItem(item) {
-        item.isOpen = false;
-        item.el.removeClass('open');
-
-        item.sublistEl.slideUp(function() {
-            if (item.id >= 0) {
-                item.sublistEl.empty();
-            }
-        });
-
-        item.el.add(item.el.find('.bm-item.open')).map(function() {
-            B.storage(
-                $(this).attr('data-id') + '-' + STORAGE_KEY_IS_OPEN,
-                undefined);
-        });
+        item.select(less);
     }
 
     /**
      * 创建并注册一个书签项，如果该书签项已被创建，则不再重新创建，而是返回已有的。
      */
-    function createItem(node) {
-        var item = {
-            id: node.id,
-            data: node,
-            el: $(
-                '<li id="bmitem-' + node.id + '" class="bm-item"' +
-                   ' data-id="' + node.id + '"' +
-                   ' data-index="' + node.index + '">' +
-                '</li>'
-            ),
-            isOpen:  node.isOpen || B.storage(node.id + '-' + STORAGE_KEY_IS_OPEN)
-        };
+    function createItem(node, parent) {
+        var item;
 
-        // bookmark
         if (node.url) {
-            // separator bookmark
+            // separator
             if (node.isSeparatorBookmark) {
-                fillSeparatorItem(item);
+                item = new SeparatorItem(node, parent);
             }
-            // history bookmark
+            // history
             else if (node.isHistory) {
-                fillHistoryItem(item);
+                item = new HistoryItem(node, parent);
             }
-            // common bookmark
+            // bookmark
             else {
-                fillBookmarkItem(item);
+                item = new BookmarkItem(node, parent);
             }
         }
         // folder
         else {
-            fillDirectoryItem(item);
+            item = new DirectoryItem(node, parent);
         }
-
-        // 在元素中添加条目类型属性
-        item.el.attr('data-type', item.type);
-
-        // 创建双向绑定
-        item.el.data('item', item);
-        item.titleEl = item.el.find('> .bm-item-title');
 
         return item;
     }
 
-    /**
-     *  根据节点数据更新 Item 的显示内容
-     */
-    function updateItem(item) {
-        item.el.attr('data-index', item.data.index);
+    var
 
-        // bookmark
-        if (item.data.url) {
-            // separator bookmark
-            if (item.data.isSeparatorBookmark) {
-                updateSeparatorItem(item);
+    Item = Class.create({
+        initialize: function(node, parent) {
+            // init props
+            this.id     = node.id;
+            this.data   = node;
+            this.type   = this.constructor.TYPE_ID;
+            this.el     = $(
+                '<li id="bmitem-' + node.id + '" class="bm-item"' +
+                    ' data-id="' + node.id + '"' +
+                    ' data-index="' + node.index + '"' +
+                    ' data-type="' + this.type + '">' +
+                    '</li>'
+            );
+
+            this.fill();
+            this.titleEl = this.el.find('> .bm-item-title');
+
+            this.update();
+
+            // 创建双向绑定
+            this.el.data('item', this);
+
+            // 插到父节点中
+            if (parent) {
+                if (parent === bmRootList) {
+                    bmRootList.append(this.el);
+                }
+                else if (parent.type === DirectoryItem.TYPE_ID) {
+                    parent.sublistEl.append(this.el);
+                }
             }
-            // history bookmark
-            else if (item.data.isHistory) {
-                updateHistoryItem(item);
+
+            // 打开
+            if (this.isOpen) {
+                this.open(undefined, false);
             }
-            // common bookmark
+        },
+
+        update: function() {
+            this.el.attr('data-index', this.data.index);
+        },
+
+        /**
+         * 选中一个条目
+         *
+         * @param less! {Boolean} {false}
+         *     是否是静默选中，当为静默选中时，在将元素标记为选中状态的同时，
+         *     也会标识一个静默状态，同时不会将让该条目取得焦点。
+         *     如果要取消静默状态，只要重新选中该条目即可。
+         */
+        select: function(less) {
+            if (selectedItem) {
+                selectedItem.el.removeClass('selected less');
+            }
+
+            this.el.addClass('selected');
+
+            if (less) {
+                this.el.addClass('less');
+            }
+            else if (this.titleEl[0] !== document.activeElement) {
+                this.titleEl.focus();
+            }
+
+            selectedItem = this;
+        },
+
+        toggle: function(args, sw) {
+            args = args || [];
+
+            if ( sw !== false && (sw || !this.isOpen) ) {
+                this.open.apply(this, args);
+            }
             else {
-                updateBookmarkItem(item);
+                this.close.apply(this, args);
+            }
+        },
+
+        open: $.noop,
+        close: $.noop
+    }),
+
+    DirectoryItem = Item.extend({
+        Statics: {
+            TYPE_ID: 1
+        },
+
+        initialize: function(node, parent) {
+            this.isOpen = node.isOpen || B.storage(node.id + '-' + STORAGE_KEY_IS_OPEN);
+            DirectoryItem.superclass.initialize.call(this, node, parent);
+        },
+
+        fill: function() {
+            this.sublistEl = $('<ul class="bm-sublist" style="display:none"></ul>');
+            this.el.addClass('bm-item-directory').append(
+                '<span class="bm-item-title" tabindex="0">' +
+                    '<i class="bm-item-favicon"></i>' +
+                    '<span class="text"></span>' +
+                '</span>',
+                this.sublistEl
+            );
+        },
+
+        update: function() {
+            DirectoryItem.superclass.update.call(this);
+            this.el.find('> .bm-item-title .text').text(this.data.title);
+        },
+
+        open: function(keys, animate) {
+            var self = this;
+
+            keys = keys || {};
+
+            self.isOpen = true;
+            self.el.addClass('open');
+
+            // 存储打开状态
+            B.storage(
+                self.id + '-' + STORAGE_KEY_IS_OPEN,
+                true);
+
+
+            // 插入子书签项
+            if (self.id >= 0) {
+                B.getChildren(self.id, function(subnodes) {
+                    if (!subnodes) { return; }
+
+                    var i, l;
+
+                    for (i = 0, l = subnodes.length; i < l; i++) {
+                        createItem(subnodes[i], self);
+                    }
+
+                    if (animate !== false) {
+                        self.sublistEl.slideDown();
+                    }
+                    else {
+                        self.sublistEl.show();
+                    }
+                });
+            }
+            else {
+                if (animate !== false) {
+                    self.sublistEl.slideDown();
+                }
+                else {
+                    self.sublistEl.show();
+                }
+            }
+
+        },
+
+        close: function() {
+            var self = this;
+            self.isOpen = false;
+            self.el.removeClass('open');
+
+            self.sublistEl.slideUp(function() {
+                if (self.id >= 0) {
+                    self.sublistEl.empty();
+                }
+            });
+
+            self.el.add(self.el.find('.bm-item.open')).map(function() {
+                B.storage(
+                    $(this).attr('data-id') + '-' + STORAGE_KEY_IS_OPEN,
+                    undefined);
+            });
+        }
+    }),
+
+    BookmarkItem = Item.extend({
+        Statics: {
+            TYPE_ID: 2
+        },
+
+        fill: function() {
+            this.el.addClass('bm-item-bookmark').append(
+                '<a class="bm-item-title" tabindex="0">' +
+                    '<i class="bm-item-favicon">' +
+                        '<img />' +
+                    '</i>' +
+                    '<span class="text"></span>' +
+                '</a>'
+            );
+        },
+
+        update: function() {
+            var title = this.data.title,
+                url = this.data.url;
+
+            BookmarkItem.superclass.update.call(this);
+
+            this.el.find('.bm-item-title').toggleClass('isurl', !title).attr('href', url)
+                   .find('.text').text(title || url).end()
+                   .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url);
+        },
+
+        open: function(keys) {
+            keys = keys || {};
+
+            var url = this.data.url,
+                isCtrlMeta = keys.ctrlKey || keys.metaKey,
+                isShift = keys.shiftKey;
+
+            if (isCtrlMeta) {
+                B.openUrlInNewTab(url, true);
+            }
+            else if (isShift) {
+                B.openUrlInNewWindow(url);
+            }
+            else {
+                B.openUrlInCurrentTab(url, true);
             }
         }
-        // folder
-        else {
-            updateDirectoryItem(item);
+    }),
+
+    HistoryItem = Item.extend({
+        Statics: {
+            TYPE_ID: 4
+        },
+
+        fill: function() {
+            this.el.addClass('bm-item-history').append(
+                '<a class="bm-item-title" tabindex="0">' +
+                    '<span class="last-visit-time"></span>' +
+                    '<span class="visit-count"></span>' +
+                    '<i class="bm-item-favicon">' +
+                        '<img />' +
+                    '</i>' +
+                    '<span class="text"></span>' +
+                '</a>'
+            );
+        },
+
+        update: function() {
+            var title = this.data.title,
+                url = this.data.url,
+                lastVisitTime = this.data.lastVisitTime,
+                visitCount = this.data.visitCount;
+
+            HistoryItem.superclass.update.call(this);
+
+            this.el.find('.bm-item-title').toggleClass('isurl', !title).attr('href', url)
+                   .find('.text').text(title || url).end()
+                   .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url).end()
+                   .find('.last-visit-time').text(moment(lastVisitTime).format('YYYY-MM-DD')).end()
+                   .find('.visit-count').text(visitCount);
+        },
+
+        open: function(keys) {
+            keys = keys || {};
+
+            var url = this.data.url,
+                isCtrlMeta = keys.ctrlKey || keys.metaKey,
+                isShift = keys.shiftKey;
+
+            if (isCtrlMeta) {
+                B.openUrlInNewTab(url, true);
+            }
+            else if (isShift) {
+                B.openUrlInNewWindow(url);
+            }
+            else {
+                B.openUrlInCurrentTab(url, true);
+            }
         }
-    }
 
-    function fillDirectoryItem(item) {
-        item.type = BM_ITEM_TYPE_DIRECTORY;
-        item.sublistEl = $('<ul class="bm-sublist" style="display:none"></ul>');
-        item.el.addClass('bm-item-directory').append(
-            '<span class="bm-item-title" tabindex="0">' +
-                '<i class="bm-item-favicon"></i>' +
-                '<span class="text"></span>' +
-            '</span>',
-            item.sublistEl
-        );
+    }),
 
-        updateDirectoryItem(item);
-    }
+    SeparatorItem = Item.extend({
+        Statics: {
+            TYPE: 3
+        },
 
-    function updateDirectoryItem(item) {
-        item.el.find('.bm-item-title .text').text(item.data.title);
-    }
+        fill: function() {
+            this.el.addClass('bm-item-separator').append(
+                '<span class="bm-item-title" tabindex="0">' +
+                    '<span class="line-l"></span>' +
+                    '<span class="text"></span>' +
+                    '<span class="line-r"></span>' +
+                '</span>'
+            );
+        },
 
-    function fillBookmarkItem(item) {
-        item.type = BM_ITEM_TYPE_BOOKMARK;
-        item.el.addClass('bm-item-bookmark').append(
-            '<a class="bm-item-title" tabindex="0">' +
-                '<i class="bm-item-favicon">' +
-                    '<img />' +
-                '</i>' +
-                '<span class="text"></span>' +
-            '</a>'
-        );
-
-        updateBookmarkItem(item);
-    }
-
-    function updateBookmarkItem(item) {
-        var title = item.data.title,
-            url = item.data.url;
-
-        item.el.find('.bm-item-title').toggleClass('isurl', !title).attr('href', url)
-               .find('.text').text(title || url).end()
-               .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url);
-    }
-
-    function fillHistoryItem(item) {
-        item.type = BM_ITEM_TYPE_HISTORY;
-        item.el.addClass('bm-item-history').append(
-            '<a class="bm-item-title" tabindex="0">' +
-                '<span class="last-visit-time"></span>' +
-                '<span class="visit-count"></span>' +
-                '<i class="bm-item-favicon">' +
-                    '<img />' +
-                '</i>' +
-                '<span class="text"></span>' +
-            '</a>'
-        );
-
-        updateHistoryItem(item);
-    }
-
-    function updateHistoryItem(item) {
-        var title = item.data.title,
-            url = item.data.url;
-
-        item.el.find('.bm-item-title').toggleClass('isurl', !title).attr('href', url)
-               .find('.text').text(title || url).end()
-               .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url).end()
-               .find('.last-visit-time').text(moment(item.data.lastVisitTime).format('YYYY-MM-DD')).end()
-               .find('.visit-count').text(item.data.visitCount);
-    }
-
-    function fillSeparatorItem(item) {
-        item.type = BM_ITEM_TYPE_SEPARATOR;
-        item.el.addClass('bm-item-separator').append(
-            '<span class="bm-item-title" tabindex="0">' +
-                '<span class="line-l"></span>' +
-                '<span class="text"></span>' +
-                '<span class="line-r"></span>' +
-            '</span>'
-        );
-
-        updateSeparatorItem(item);
-    }
-
-    function updateSeparatorItem(item) {
-        var title  = item.data.title;
-        item.el.find('.bm-item-title .text').toggleClass('h', !title).text(title);
-    }
+        update: function() {
+            var title  = this.data.title;
+            SeparatorItem.superclass.update.call(this);
+            this.el.find('.bm-item-title .text').toggleClass('h', !title).text(title);
+        }
+    });
 })(jQuery, simpleBookmarks);

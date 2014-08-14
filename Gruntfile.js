@@ -161,7 +161,7 @@ module.exports = function (grunt) {
             install: {
                 options: {
                     targetDir: 'app/scripts/vendors',
-                    cleanTargetDir: true,
+                    // cleanTargetDir: true,
                     layout: 'byComponent'
                 }
             }
