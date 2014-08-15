@@ -269,7 +269,7 @@
         confirm: function(message, callback) {
             var confirmPanel = $('#fixed-top .confirm-panel');
 
-            confirmPanel.find('> p').text(message);
+            confirmPanel.find('> p').html(message);
 
             confirmPanel.off('click.confirm');
             confirmPanel.on('click.confirm', '.confirm', callback);
