@@ -269,9 +269,7 @@
                 openChildrens(item.id, '隐身窗口', function(urls) { B.openUrlInNewWindow(urls, true); });
                 break;
             case 'remove' :
-                chrome.bookmarks.removeTree(item.id, function() {
-                    item.el.remove();
-                });
+                item.remove();
                 break;
             case 'edit' :
                 B.edit(item.data, function() {
@@ -287,7 +285,12 @@
         var item = options.$trigger.closest('.bm-item').data('item');
 
         if ( key === 'edit' || key === 'remove' ) {
+            // 根目录不能修改
             if ( item.data.parentId === B.rootFolderId ) {
+                return true;
+            }
+            // 虚拟目录不能修改
+            if ( item.id < 0 ) {
                 return true;
             }
         }
@@ -484,6 +487,19 @@
         },
 
         /**
+         * 删除条目
+         */
+        remove: function() {
+            var self = this;
+
+            chrome.bookmarks.removeTree(self.id, function() {
+                self.el.slideUp(ANIMATE_TIME, function() {
+                    self.el.remove();
+                });
+            });
+        },
+
+        /**
          * 选中一个条目
          *
          * @param less! {Boolean} {false}
@@ -547,6 +563,59 @@
         update: function() {
             DirectoryItem.superclass.update.call(this);
             this.el.find('> .bm-item-title .text').text(this.data.title);
+        },
+
+        remove: function() {
+            var self = this;
+
+            B.getChildren(this.id, function(nodes) {
+                var count = 0,
+                    bookmarkCount = 0,
+                    folderCount = 0,
+                    bookmarkMsg, folderMsg;
+
+                // 统计数量
+                $.each(nodes, function(i, node) {
+                    if (node.url) {
+                        if (!node.isSeparatorBookmark) {
+                            count++;
+                            bookmarkCount++;
+                        }
+                    }
+                    else {
+                        count++;
+                        folderCount++;
+                    }
+                });
+
+                // 如果为空目录，则直接删除
+                if (count === 0) {
+                    supe();
+                }
+                // 否则给出提示，待确认后删除
+                else {
+                    bookmarkMsg = bookmarkCount + ' 个书签';
+                    folderMsg = folderCount + ' 个子目录';
+
+                    self.open();
+
+                    B.confirm(
+                        '你确定要删除该目录吗？<br />' +
+                        self.data.title + ' 目录包含 ' +
+                        ( bookmarkCount && folderCount ? bookmarkMsg + '及 ' + folderMsg :
+                                         bookmarkCount ? bookmarkMsg :
+                                                         folderMsg ) +
+                        '。',
+                        function() {
+                            supe();
+                        }
+                    );
+                }
+            });
+
+            function supe() {
+                DirectoryItem.superclass.remove.call(self);
+            }
         },
 
         open: function(keys, animate) {
