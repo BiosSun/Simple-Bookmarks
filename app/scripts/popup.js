@@ -173,16 +173,16 @@
     },
 
     bmItemTitleKeyUpHandlers = {
-        // enter
-        13: function(item, e) {
-            item.toggle({ keys: e });
-        },
         // remove
         46: function(item) {
             item.remove();
         }
     },
     bmItemTitleKeyDownHandlers = {
+        // enter
+        13: function(item, e) {
+            item.toggle({ keys: e });
+        },
         // up
         38: function(item) {
             var prevItem = item.getPrevItem();
