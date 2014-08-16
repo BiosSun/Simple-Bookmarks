@@ -508,7 +508,13 @@
             var self = this;
 
             chrome.bookmarks.removeTree(self.id, function() {
+                var nearestItem = self.getNextItem() || self.getPrevItem();
+
                 self.el.slideUp(ANIMATE_TIME, function() {
+                    if (self.isSelected && nearestItem) {
+                        nearestItem.select();
+                    }
+
                     self.el.remove();
                 });
             });
