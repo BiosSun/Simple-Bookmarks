@@ -52,7 +52,7 @@
             var itemEl = $(this).closest('.bm-item'),
                 item = itemEl.data('item');
 
-            item.toggle([e]);
+            item.toggle({ keys: e });
 
             return false;
         });
@@ -175,7 +175,7 @@
     bmItemTitleKeyUpHandlers = {
         // enter
         13: function(item, e) {
-            item.toggle([e]);
+            item.toggle({ keys: e });
         },
         // remove
         46: function(item) {
@@ -339,8 +339,8 @@
                     title: '浏览记录'
                 }, bmRootList);
 
-            searchBookmarkFolderItem.open(undefined, false);
-            searchHistoryFolderItem.open(undefined, false);
+            searchBookmarkFolderItem.open({ animate: false });
+            searchHistoryFolderItem.open({ animate: false });
 
             // 检索书签
             B.traversalBookmarks(function(node) {
@@ -493,7 +493,7 @@
 
             // 打开
             if (this.isOpen) {
-                this.open(undefined, false);
+                this.open({ animate: false });
             }
         },
 
@@ -505,19 +505,23 @@
          * 删除条目
          */
         remove: function() {
+            chrome.bookmarks.removeTree(this.id, $.proxy(this, '_removeEl'));
+        },
+
+        _removeEl: function() {
             var self = this;
 
-            chrome.bookmarks.removeTree(self.id, function() {
+            this.close({ callback: function() {
                 var nearestItem = self.getNextItem() || self.getPrevItem();
 
-                self.el.slideUp(ANIMATE_TIME, function() {
+                self.el.slideUp(ANIMATE_TIME / 2, function() {
                     if (self.isSelected && nearestItem) {
                         nearestItem.select();
                     }
 
                     self.el.remove();
                 });
-            });
+            }});
         },
 
         /**
@@ -547,14 +551,12 @@
             return this;
         },
 
-        toggle: function(args, sw) {
-            args = args || [];
-
+        toggle: function(options, sw) {
             if ( sw !== false && (sw || !this.isOpen) ) {
-                this.open.apply(this, args);
+                this.open.call(this, options);
             }
             else {
-                this.close.apply(this, args);
+                this.close.call(this, options);
             }
 
             return this;
@@ -563,7 +565,13 @@
         open: function() {
             return this;
         },
-        close: function() {
+        close: function(options) {
+            options = options || {};
+
+            if (options.callback) {
+                options.callback(this);
+            }
+
             return this;
         },
 
@@ -655,7 +663,7 @@
 
                 // 如果为空目录，则直接删除
                 if (count === 0) {
-                    supe();
+                    DirectoryItem.superclass.remove.call(self);
                 }
                 // 否则给出提示，待确认后删除
                 else {
@@ -672,21 +680,21 @@
                                                          folderMsg ) +
                         '。',
                         function() {
-                            supe();
+                            DirectoryItem.superclass.remove.call(self);
+                        },
+                        function() {
+                            self.select();
                         }
                     );
                 }
             });
-
-            function supe() {
-                DirectoryItem.superclass.remove.call(self);
-            }
         },
 
-        open: function(keys, animate) {
-            var self = this;
+        open: function(options) {
+            options = options || {};
+            options.keys = options.keys || {};
 
-            keys = keys || {};
+            var self = this;
 
             self.isOpen = true;
             self.el.addClass('open');
@@ -708,7 +716,7 @@
                         createItem(subnodes[i], self);
                     }
 
-                    if (animate !== false) {
+                    if (options.animate !== false) {
                         self.sublistEl.slideDown(ANIMATE_TIME);
                     }
                     else {
@@ -717,7 +725,7 @@
                 });
             }
             else {
-                if (animate !== false) {
+                if (options.animate !== false) {
                     self.sublistEl.slideDown(ANIMATE_TIME);
                 }
                 else {
@@ -728,24 +736,39 @@
             return this;
         },
 
-        close: function() {
+        close: function(options) {
+            options = options || {};
+
             var self = this;
             self.isOpen = false;
             self.el.removeClass('open');
 
-            self.sublistEl.slideUp(ANIMATE_TIME, function() {
-                if (self.id >= 0) {
-                    self.sublistEl.empty();
-                }
-            });
-
+            // 关闭所有的已打开的子目录
             self.el.add(self.el.find('.bm-item.open')).map(function() {
                 B.storage(
                     $(this).attr('data-id') + '-' + STORAGE_KEY_IS_OPEN,
                     undefined);
             });
 
+            if (options.animate) {
+                self.sublistEl.slideUp(ANIMATE_TIME, closeAfter);
+            }
+            else {
+                self.sublistEl.hide();
+                closeAfter();
+            }
+
             return this;
+
+            function closeAfter() {
+                if (self.id >= 0) {
+                    self.sublistEl.empty();
+                }
+
+                if (options.callback) {
+                    options.callback(self);
+                }
+            }
         }
     }),
 
@@ -776,12 +799,13 @@
                    .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url);
         },
 
-        open: function(keys) {
-            keys = keys || {};
+        open: function(options) {
+            options = options || {};
+            options.keys = options.keys || {};
 
             var url = this.data.url,
-                isCtrlMeta = keys.ctrlKey || keys.metaKey,
-                isShift = keys.shiftKey;
+                isCtrlMeta = options.keys.ctrlKey || options.keys.metaKey,
+                isShift = options.keys.shiftKey;
 
             if (isCtrlMeta) {
                 B.openUrlInNewTab(url, true);

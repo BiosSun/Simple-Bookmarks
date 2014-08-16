@@ -264,14 +264,18 @@
         },
 
         // 显示一个确认提示
-        confirm: function(message, callback) {
+        confirm: function(message, confirmCallback, cancelCollback) {
             var confirmPanel = $('#fixed-top .confirm-panel');
 
             confirmPanel.find('> p').html(message);
 
             confirmPanel.off('click.confirm');
-            confirmPanel.on('click.confirm', '.confirm', callback);
+            confirmPanel.on('click.confirm', '.confirm', function() {
+                confirmCallback();
+                B.showSearchPanel();
+            });
             confirmPanel.on('click.confirm', '.cancel', function() {
+                cancelCollback();
                 B.showSearchPanel();
             });
 
