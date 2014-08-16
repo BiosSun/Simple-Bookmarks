@@ -565,6 +565,10 @@
             return this.el.is(':visible');
         },
 
+        isSelected: function() {
+            return this.titleEl.hasClass('selected');
+        },
+
         getParentItem: function() {
             return Item.get(this.data.parentId);
         },
