@@ -194,9 +194,7 @@
         },
 
         _traversalBookmarkNode: function(node, callback) {
-            if (node.title) {
-                callback(node);
-            }
+            callback(node);
 
             if (node.children) {
                 $.each(node.children, function(i, node) {
