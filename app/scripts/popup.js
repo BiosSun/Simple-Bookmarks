@@ -182,28 +182,17 @@
     },
     bmItemTitleKeyDownHandlers = {
         // up
-        38: function(item, $item) {
-            var allItemEl = bmRootList.find('.bm-item'),
-                selItemElIndex = allItemEl.index($item) - 1;
-
-            if (selItemElIndex !== -1) {
-                selectItem(allItemEl.eq(selItemElIndex).data('item'));
-            }
-            else {
-                searchInput.focus();
-            }
+        38: function(item) {
+            var prevItem = item.getPrevItem();
+            if (prevItem) { selectItem(prevItem); }
+            else { searchInput.focus(); }
         },
         // down
-        40: function(item, $item) {
-            var allItemEl = bmRootList.find('.bm-item'),
-                selItemElIndex = (allItemEl.index($item) + 1) % allItemEl.length;
-
-            if (selItemElIndex !== 0) {
-                selectItem(allItemEl.eq(selItemElIndex).data('item'));
-            }
+        40: function(item) {
+            var nextItem = item.getNextItem();
+            if (nextItem) { selectItem(nextItem); }
             else {
-                selectItem(allItemEl.eq(selItemElIndex).data('item'), true);
-                bmRootList.scrollTop(0);
+                selectItem(Item.getFirstItem());
                 searchInput.focus();
             }
         }
@@ -223,18 +212,19 @@
     searchInputKeyDownHandlers = {
         // up
         38: function() {
-            var $allItems = bmRootList.find('.bm-item'),
-                $item;
+            var item;
 
             // 如果当前有选中条目，则选择该选中项的上一个条目。
-            if (selectedItem && selectedItem.el.is(':visible')) {
-                $item = $allItems.eq($allItems.index(selectedItem.el) - 1);
-            }
-            else {
-                $item = $allItems.last();
+            if ( selectedItem && selectedItem.isVisible() ) {
+                item = selectedItem.getPrevItem();
             }
 
-            selectItem($item.data('item'));
+            // 否则选中列表中的最后一个元素
+            if ( !item ) {
+                item = Item.getLastItem();
+            }
+
+            selectItem(item);
         },
         // down
         40: function() {
@@ -445,6 +435,16 @@
     var
 
     Item = Class.create({
+        Statics: {
+            getLastItem: function() {
+                return bmRootList.find('.bm-item:visible:last').data('item');
+            },
+
+            getFirstItem: function() {
+                return bmRootList.find('.bm-item:visible:first').data('item');
+            }
+        },
+
         initialize: function(node, parent) {
             // init props
             this.id     = node.id;
@@ -536,7 +536,35 @@
         },
 
         open: $.noop,
-        close: $.noop
+        close: $.noop,
+
+        isVisible: function() {
+            return this.el.is(':visible');
+        },
+
+        /**
+         * 获取当前条目在列表中的上一个条目
+         */
+        getPrevItem: function() {
+            var allItemEl = bmRootList.find('.bm-item:visible'),
+                prevItemElIndex = allItemEl.index(this.el) - 1;
+
+            return prevItemElIndex !== -1 ?
+                allItemEl.eq(prevItemElIndex).data('item') :
+                undefined;
+        },
+
+        /**
+         * 获取当前条目在列表中的下一个条目
+         */
+        getNextItem: function() {
+            var allItemEl = bmRootList.find('.bm-item:visible'),
+                nextItemElIndex = allItemEl.index(this.el) + 1;
+
+            return nextItemElIndex < allItemEl.length ?
+                allItemEl.eq(nextItemElIndex).data('item') :
+                undefined;
+        }
     }),
 
     DirectoryItem = Item.extend({
