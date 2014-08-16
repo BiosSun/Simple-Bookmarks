@@ -160,14 +160,11 @@
 
     bmItemKeyEventsHandler = function(handlers, e) {
         var handler = handlers[e.keyCode],
-            $title, $item, item;
+            item;
 
         if (handler) {
-            $title = $(e.target);
-            $item = $title.closest('.bm-item');
-            item = $item.data('item');
-
-            handler(item, $item, $title, e);
+            item = $(e.target).closest('.bm-item').data('item');
+            handler(item, e);
             return false;
         }
         else {
@@ -176,8 +173,13 @@
     },
 
     bmItemTitleKeyUpHandlers = {
-        13: function(item, $item, $title, e) {
+        // enter
+        13: function(item, e) {
             item.toggle([e]);
+        },
+        // remove
+        46: function(item) {
+            item.remove();
         }
     },
     bmItemTitleKeyDownHandlers = {
@@ -194,6 +196,13 @@
             else {
                 selectItem(Item.getFirstItem());
                 searchInput.focus();
+            }
+        },
+        // backspace
+        8: function(item) {
+            var parentItem = item.getParentItem();
+            if (parentItem) {
+                parentItem.select().close();
             }
         }
     },
@@ -228,7 +237,10 @@
         },
         // down
         40: function() {
-            selectItem(selectedItem);
+            var item = selectedItem && selectedItem.isVisible() ?
+                    selectedItem : Item.getFirstItem();
+
+            if (item) { item.select(); }
         }
     };
 
@@ -436,6 +448,9 @@
 
     Item = Class.create({
         Statics: {
+            get: function(id) {
+                return bmRootList.find('#bmitem-' + id).data('item');
+            },
             getLastItem: function() {
                 return bmRootList.find('.bm-item:visible:last').data('item');
             },
@@ -522,6 +537,8 @@
             }
 
             selectedItem = this;
+
+            return this;
         },
 
         toggle: function(args, sw) {
@@ -533,13 +550,23 @@
             else {
                 this.close.apply(this, args);
             }
+
+            return this;
         },
 
-        open: $.noop,
-        close: $.noop,
+        open: function() {
+            return this;
+        },
+        close: function() {
+            return this;
+        },
 
         isVisible: function() {
             return this.el.is(':visible');
+        },
+
+        getParentItem: function() {
+            return Item.get(this.data.parentId);
         },
 
         /**
@@ -688,6 +715,7 @@
                 }
             }
 
+            return this;
         },
 
         close: function() {
@@ -706,6 +734,8 @@
                     $(this).attr('data-id') + '-' + STORAGE_KEY_IS_OPEN,
                     undefined);
             });
+
+            return this;
         }
     }),
 
@@ -752,6 +782,8 @@
             else {
                 B.openUrlInCurrentTab(url, true);
             }
+
+            return this;
         }
     }),
 
@@ -804,6 +836,8 @@
             else {
                 B.openUrlInCurrentTab(url, true);
             }
+
+            return this;
         }
 
     }),
