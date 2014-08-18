@@ -200,9 +200,16 @@
         },
         // backspace
         8: function(item) {
-            var parentItem = item.getParentItem();
-            if (parentItem) {
-                parentItem.select().close();
+            var parentItem;
+
+            if (item.isOpen) {
+                item.close();
+            }
+            else {
+                parentItem = item.getParentItem();
+                if (parentItem) {
+                    parentItem.select().close();
+                }
             }
         }
     },
@@ -286,15 +293,11 @@
     function contextMenuDisabled(key, options) {
         var item = options.$trigger.closest('.bm-item').data('item');
 
-        if ( key === 'edit' || key === 'remove' ) {
-            // 根目录不能修改
-            if ( item.data.parentId === B.rootFolderId ) {
-                return true;
-            }
-            // 虚拟目录不能修改
-            if ( item.id < 0 ) {
-                return true;
-            }
+        switch (key) {
+            case 'edit':
+                return !item.checkRemove();
+            case 'remove':
+                return  !item.checkEdit();
         }
 
         return false;
@@ -505,7 +508,15 @@
          * 删除条目
          */
         remove: function() {
-            chrome.bookmarks.removeTree(this.id, $.proxy(this, '_removeEl'));
+            var self = this;
+            if (this.checkRemove()) {
+                chrome.bookmarks.removeTree(this.id, $.proxy(this, '_removeEl'));
+            }
+            else {
+                B.alert('该条目不可删除！', function() {
+                    self.select();
+                });
+            }
         },
 
         _removeEl: function() {
@@ -522,6 +533,23 @@
                     self.el.remove();
                 });
             }});
+        },
+
+        /**
+         * 判断元素是否可以被删除
+         */
+        checkRemove: function() {
+            // 根条目或虚拟条目不能被删除
+            return this.data.parentId !== B.rootFolderId && this.id > 0;
+        },
+
+
+        /**
+         * 判断元素是否可以被编辑
+         */
+        checkEdit: function() {
+            // 根条目或虚拟条目不能被编辑
+            return this.data.parentId !== B.rootFolderId && this.id > 0;
         },
 
         /**
