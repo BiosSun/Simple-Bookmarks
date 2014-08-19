@@ -175,7 +175,9 @@
     bmItemTitleKeyUpHandlers = {
         // remove
         46: function(item) {
-            item.remove();
+            if (item.checkRemove()) {
+                item.remove();
+            }
         }
     },
     bmItemTitleKeyDownHandlers = {
@@ -668,6 +670,14 @@
 
         remove: function() {
             var self = this;
+
+            if (!self.checkRemove()) {
+                B.alert('该目录不可删除', function() {
+                    self.select();
+                });
+
+                return;
+            }
 
             B.getChildren(this.id, function(nodes) {
                 var count = 0,
