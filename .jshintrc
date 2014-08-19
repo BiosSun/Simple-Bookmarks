@@ -19,5 +19,5 @@
     "trailing": true,
     "smarttabs": true,
     "jquery": true,
-    "predef": ["chrome", "simpleBookmarks", "moment", "Class"]
+    "predef": ["chrome", "simpleBookmarks", "moment", "Class", "alert"]
 }

@@ -12,40 +12,21 @@
 
         // search
         lastSearchText = '',
-        bmRootListCache,
 
         selectedItem;
 
     B.init(function() {
-        // 构建默认书签列表
-        B.getChildren(B.rootFolderId, function(nodes) {
-            var historyFolderNode, i, l;
+        // 初始化列表
+        var searchText = B.storage('search-text');
 
-            historyFolderNode = {
-                id: B.historyFolderId,
-                title: '浏览记录'
-            };
-
-            nodes.push(historyFolderNode);
-
-            for (i = 0, l = nodes.length; i < l; i++) {
-                createItem(nodes[i], bmRootList);
-            }
-
-            // 获取最近的最多 100 条浏览记录
-            chrome.history.search({
-                text: '',
-                maxResults: 100
-            }, function(historys) {
-                var $folderItem = bmRootList.find('#bmitem-' + historyFolderNode.id),
-                    folderItem = $folderItem.data('item'),
-                    i, l;
-
-                for (i = 0, l = historys.length; i < l; i++) {
-                    createItem(B.createHistoryNode(historys[i]), folderItem);
-                }
-            });
-        });
+        if ($.trim(searchText)) {
+            searchInput.val(searchText);
+            search(searchText);
+        }
+        else {
+            // 构建默认书签列表
+            buildDefaultList();
+        }
 
         // 绑定书签项的点击事件
         bmRootList.on('click', '.bm-item-title', function(e) {
@@ -55,11 +36,6 @@
             item.toggle({ keys: e });
 
             return false;
-        });
-
-        // 绑定即时搜索相关事件
-        searchInput.on('keyup', function() {
-            search($(this).val());
         });
 
         // 处理全局按键事件
@@ -142,8 +118,12 @@
             .on('keydown', '.bm-item-title', $.proxy(bmItemKeyEventsHandler, null, bmItemTitleKeyDownHandlers))
             .on('keyup', '.bm-item-title', $.proxy(bmItemKeyEventsHandler, null, bmItemTitleKeyUpHandlers));
 
-        // 使用方向键在搜索框及列表间选择条目
         searchInput
+            .on('keyup', function() {
+                var searchText = this.value;
+                search(searchText);
+                B.storage('search-text', searchText);
+            })
             .on('keyup', function(e) {
                 var handler = searchInputKeyUpHandlers[e.keyCode];
                 if (handler) { handler(); return false; }
@@ -316,6 +296,38 @@
         });
     }
 
+    // 构建默认列表
+    function buildDefaultList() {
+        B.getChildren(B.rootFolderId, function(nodes) {
+            var historyFolderNode, i, l;
+
+            historyFolderNode = {
+                id: B.historyFolderId,
+                title: '浏览记录'
+            };
+
+            nodes.push(historyFolderNode);
+
+            for (i = 0, l = nodes.length; i < l; i++) {
+                createItem(nodes[i], bmRootList);
+            }
+
+            // 获取最近的最多 100 条浏览记录
+            chrome.history.search({
+                text: '',
+                maxResults: 100
+            }, function(historys) {
+                var $folderItem = bmRootList.find('#bmitem-' + historyFolderNode.id),
+                    folderItem = $folderItem.data('item'),
+                    i, l;
+
+                for (i = 0, l = historys.length; i < l; i++) {
+                    createItem(B.createHistoryNode(historys[i]), folderItem);
+                }
+            });
+        });
+    }
+
     // 根据一个字符串查询书签项和历史记录
     function search(searchText) {
         var isFirstMatching = true;
@@ -324,13 +336,7 @@
 
         if (searchText === lastSearchText) { return; }
 
-        // 如果是初开始检索，将列表中的条目移入缓存中
-        if ( !bmRootListCache ) {
-            bmRootListCache = bmRootList.children().detach();
-        }
-        else {
-            bmRootList.empty();
-        }
+        bmRootList.empty();
 
         // 包含查询文字时，开始进行查询
         if (searchText) {
@@ -385,8 +391,7 @@
         }
         // 结束查询，将缓存中的条目再移回列表
         else {
-            bmRootList.append(bmRootListCache);
-            bmRootListCache = null;
+            buildDefaultList();
         }
 
         lastSearchText = searchText;
