@@ -263,7 +263,30 @@
             showPanel.slideDown(200);
         },
 
-        // 显示一个确认提示
+        // 显示一个提示框
+        alert: function(message, confirmCallback) {
+            var self = this,
+                alertPanel = $('#fixed-top .alert-panel');
+
+            alertPanel.find('> p').html(message);
+
+            alertPanel.off('click.alert');
+            alertPanel.on('click.alert', '.confirm', function() {
+                confirmCallback();
+                B.showSearchPanel();
+                clearTimeout(self.alertTimeout);
+            });
+
+            this.alertTimeout = setTimeout(function() {
+                confirmCallback();
+                B.showSearchPanel();
+            }, 5000);
+
+            B.hideSearchPanel(alertPanel);
+            alertPanel.find('.confirm').focus();
+        },
+
+        // 显示一个确认框
         confirm: function(message, confirmCallback, cancelCollback) {
             var confirmPanel = $('#fixed-top .confirm-panel');
 
@@ -281,7 +304,7 @@
 
             B.hideSearchPanel(confirmPanel);
 
-            confirmPanel.find('.confirm')[0].focus();
+            confirmPanel.find('.confirm').focus();
         },
 
         // 显示一个编辑表单

@@ -2679,7 +2679,7 @@ button, input, select {
 }
 
 /* line 89, ../sass/main.scss */
-.confirm-panel .button-bar {
+.alert-panel .button-bar, .confirm-panel .button-bar {
   text-align: right;
 }
 
