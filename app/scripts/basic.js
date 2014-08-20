@@ -272,13 +272,13 @@
 
             alertPanel.off('click.alert');
             alertPanel.on('click.alert', '.confirm', function() {
-                confirmCallback();
+                if (confirmCallback) { confirmCallback(); }
                 B.showSearchPanel();
                 clearTimeout(self.alertTimeout);
             });
 
             this.alertTimeout = setTimeout(function() {
-                confirmCallback();
+                if (confirmCallback) { confirmCallback(); }
                 B.showSearchPanel();
             }, 5000);
 
@@ -294,11 +294,11 @@
 
             confirmPanel.off('click.confirm');
             confirmPanel.on('click.confirm', '.confirm', function() {
-                confirmCallback();
+                if (confirmCallback) { confirmCallback(); }
                 B.showSearchPanel();
             });
             confirmPanel.on('click.confirm', '.cancel', function() {
-                cancelCollback();
+                if (cancelCollback) { cancelCollback(); }
                 B.showSearchPanel();
             });
 
