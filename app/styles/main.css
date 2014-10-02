@@ -2823,20 +2823,20 @@ button, input, select {
   margin-left: 20px;
 }
 
-/* line 247, ../sass/main.scss */
+/* line 246, ../sass/main.scss */
 .bm-item-directory > .bm-item-title > .bm-item-favicon {
   font: 16px/22px FontAwesome;
 }
-/* line 250, ../sass/main.scss */
+/* line 249, ../sass/main.scss */
 .bm-item-directory > .bm-item-title > .bm-item-favicon:before {
   content: "\f07b";
 }
-/* line 258, ../sass/main.scss */
+/* line 257, ../sass/main.scss */
 .bm-item-directory.open > .bm-item-title > .bm-item-favicon:before {
   content: "\f07c";
 }
 
-/* line 267, ../sass/main.scss */
+/* line 266, ../sass/main.scss */
 .bm-item-separator > .bm-item-title {
   position: relative;
   display: -webkit-flex;
@@ -2844,45 +2844,45 @@ button, input, select {
   display: flex;
   color: #999;
 }
-/* line 272, ../sass/main.scss */
+/* line 271, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .line-l, .bm-item-separator > .bm-item-title .line-r {
   display: block;
   height: 0;
-  margin: 9px 0 0;
+  margin: 10px 0 0;
   border-bottom: 1px dashed #bbb;
 }
-/* line 279, ../sass/main.scss */
+/* line 278, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .line-l {
   width: 20px;
 }
-/* line 283, ../sass/main.scss */
+/* line 282, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .line-r {
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
 }
-/* line 287, ../sass/main.scss */
+/* line 286, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .title {
   padding: 0 6px;
 }
-/* line 292, ../sass/main.scss */
+/* line 291, ../sass/main.scss */
 .bm-item-separator.selected > .bm-item-title {
   color: #d10d0d;
 }
-/* line 295, ../sass/main.scss */
+/* line 294, ../sass/main.scss */
 .bm-item-separator.selected > .bm-item-title .line-l, .bm-item-separator.selected > .bm-item-title .line-r {
   border-color: #d10d0d;
 }
-/* line 300, ../sass/main.scss */
+/* line 299, ../sass/main.scss */
 .bm-item-separator.selected.less > .bm-item-title {
   color: #999;
 }
-/* line 303, ../sass/main.scss */
+/* line 302, ../sass/main.scss */
 .bm-item-separator.selected.less > .bm-item-title .line-l, .bm-item-separator.selected.less > .bm-item-title .line-r {
   border-color: #bbb;
 }
 
-/* line 309, ../sass/main.scss */
+/* line 308, ../sass/main.scss */
 #bookmarks {
   overflow-y: auto;
   padding: 8px;
