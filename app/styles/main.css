@@ -2759,25 +2759,29 @@ button, input, select {
   cursor: pointer;
 }
 /* line 170, ../sass/main.scss */
-.bm-item-title.isurl {
-  color: #999;
-}
-/* line 174, ../sass/main.scss */
 .bm-item-title:focus {
   outline: 0;
 }
-/* line 178, ../sass/main.scss */
+/* line 174, ../sass/main.scss */
 .bm-item-title:hover, .less.selected > .bm-item-title, .bm-item-title.context-menu-active {
   background: #f0f0f0;
   color: inherit;
 }
-/* line 183, ../sass/main.scss */
+/* line 181, ../sass/main.scss */
 .selected > .bm-item-title {
   background: #e0e0e0;
   color: #D10D0D;
 }
+/* line 186, ../sass/main.scss */
+.bm-item-title .title.isurl {
+  color: #999;
+}
+/* line 190, ../sass/main.scss */
+.bm-item-title .desc {
+  color: #999;
+}
 
-/* line 189, ../sass/main.scss */
+/* line 195, ../sass/main.scss */
 .bm-item-favicon {
   display: inline-block;
   width: 22px;
@@ -2789,19 +2793,19 @@ button, input, select {
   color: #87A9C4;
 }
 
-/* line 204, ../sass/main.scss */
+/* line 210, ../sass/main.scss */
 .bm-item-bookmark > .bm-item-title > .bm-item-favicon, .bm-item-history > .bm-item-title > .bm-item-favicon {
   font-size: 0;
   line-height: 22px;
 }
-/* line 208, ../sass/main.scss */
+/* line 214, ../sass/main.scss */
 .bm-item-bookmark > .bm-item-title > .bm-item-favicon img, .bm-item-history > .bm-item-title > .bm-item-favicon img {
   vertical-align: middle;
   position: relative;
   top: -1px;
 }
 
-/* line 218, ../sass/main.scss */
+/* line 224, ../sass/main.scss */
 .bm-item-history > .bm-item-title .last-visit-time, .bm-item-history > .bm-item-title .visit-count {
   float: right;
   height: 16px;
@@ -2812,28 +2816,28 @@ button, input, select {
   line-height: 16px;
   color: #999;
 }
-/* line 229, ../sass/main.scss */
+/* line 235, ../sass/main.scss */
 .bm-item-history > .bm-item-title .visit-count {
   width: 3em;
   text-align: right;
   margin-left: 20px;
 }
 
-/* line 237, ../sass/main.scss */
+/* line 243, ../sass/main.scss */
 .bm-item-directory > .bm-item-title > .bm-item-favicon {
   font: 16px/22px FontAwesome;
 }
-/* line 240, ../sass/main.scss */
+/* line 246, ../sass/main.scss */
 .bm-item-directory > .bm-item-title > .bm-item-favicon:before {
   content: "\f07b";
 }
 
-/* line 247, ../sass/main.scss */
+/* line 253, ../sass/main.scss */
 .bm-item-directory.open > .bm-item-title > .bm-item-favicon:before {
   content: "\f07c";
 }
 
-/* line 254, ../sass/main.scss */
+/* line 260, ../sass/main.scss */
 .bm-item-separator > .bm-item-title {
   position: relative;
   display: -webkit-flex;
@@ -2841,45 +2845,45 @@ button, input, select {
   display: flex;
   color: #999;
 }
-/* line 259, ../sass/main.scss */
+/* line 265, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .line-l, .bm-item-separator > .bm-item-title .line-r {
   display: block;
   height: 0;
   margin: 9px 0 0;
   border-bottom: 1px dashed #bbb;
 }
-/* line 266, ../sass/main.scss */
+/* line 272, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .line-l {
   width: 20px;
 }
-/* line 270, ../sass/main.scss */
+/* line 276, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .line-r {
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
 }
-/* line 274, ../sass/main.scss */
-.bm-item-separator > .bm-item-title .text {
+/* line 280, ../sass/main.scss */
+.bm-item-separator > .bm-item-title .title {
   padding: 0 6px;
 }
-/* line 279, ../sass/main.scss */
+/* line 285, ../sass/main.scss */
 .bm-item-separator.selected > .bm-item-title {
   color: #d10d0d;
 }
-/* line 282, ../sass/main.scss */
+/* line 288, ../sass/main.scss */
 .bm-item-separator.selected > .bm-item-title .line-l, .bm-item-separator.selected > .bm-item-title .line-r {
   border-color: #d10d0d;
 }
-/* line 287, ../sass/main.scss */
+/* line 293, ../sass/main.scss */
 .bm-item-separator.selected.less > .bm-item-title {
   color: #999;
 }
-/* line 290, ../sass/main.scss */
+/* line 296, ../sass/main.scss */
 .bm-item-separator.selected.less > .bm-item-title .line-l, .bm-item-separator.selected.less > .bm-item-title .line-r {
   border-color: #bbb;
 }
 
-/* line 296, ../sass/main.scss */
+/* line 302, ../sass/main.scss */
 #bookmarks {
   overflow-y: auto;
   padding: 8px;

@@ -167,15 +167,13 @@ button, input, select {
 
     cursor: pointer;
 
-    &.isurl {
-        color: #999;
-    }
-
     &:focus {
         outline: 0;
     }
 
-    &:hover, .less.selected > &, &.context-menu-active {
+    &:hover,
+    .less.selected > &,
+    &.context-menu-active {
         background: #f0f0f0;
         color: inherit;
     }
@@ -183,6 +181,14 @@ button, input, select {
     .selected > & {
         background: #e0e0e0;
         color: #D10D0D;
+    }
+
+    .title.isurl {
+        color: #999;
+    }
+
+    .desc {
+        color: #999;
     }
 }
 
@@ -271,7 +277,7 @@ button, input, select {
             flex: 1;
         }
 
-        .text {
+        .title {
             padding: 0 6px;
         }
     }

@@ -662,7 +662,7 @@
             this.el.addClass('bm-item-directory').append(
                 '<span class="bm-item-title" tabindex="0">' +
                     '<i class="bm-item-favicon"></i>' +
-                    '<span class="text"></span>' +
+                    '<span class="title"></span>' +
                 '</span>',
                 this.sublistEl
             );
@@ -670,7 +670,7 @@
 
         update: function() {
             DirectoryItem.superclass.update.call(this);
-            this.el.find('> .bm-item-title .text').text(this.data.title);
+            this.el.find('> .bm-item-title .title').text(this.data.title);
         },
 
         remove: function() {
@@ -826,19 +826,24 @@
                     '<i class="bm-item-favicon">' +
                         '<img />' +
                     '</i>' +
-                    '<span class="text"></span>' +
+                    '<span class="title"></span>' +
+                    '<span class="desc"></span>' +
                 '</a>'
             );
         },
 
         update: function() {
             var title = this.data.title,
-                url = this.data.url;
+                url = this.data.url,
+                desc = this.data.desc;
 
             BookmarkItem.superclass.update.call(this);
 
-            this.el.find('.bm-item-title').toggleClass('isurl', !title).attr('href', url)
-                   .find('.text').text(title || url).end()
+            console.info(desc);
+
+            this.el.find('.bm-item-title').attr('href', url)
+                   .find('.title').toggleClass('isurl', !title).text(title || url).end()
+                   .find('.desc').toggleClass('h', !desc).text(' | ' + desc).end()
                    .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url);
         },
 
@@ -877,7 +882,7 @@
                     '<i class="bm-item-favicon">' +
                         '<img />' +
                     '</i>' +
-                    '<span class="text"></span>' +
+                    '<span class="title"></span>' +
                 '</a>'
             );
         },
@@ -891,7 +896,7 @@
             HistoryItem.superclass.update.call(this);
 
             this.el.find('.bm-item-title').toggleClass('isurl', !title).attr('href', url)
-                   .find('.text').text(title || url).end()
+                   .find('.title').text(title || url).end()
                    .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url).end()
                    .find('.last-visit-time').text(moment(lastVisitTime).format('YYYY-MM-DD')).end()
                    .find('.visit-count').text(visitCount);
@@ -928,7 +933,7 @@
             this.el.addClass('bm-item-separator').append(
                 '<span class="bm-item-title" tabindex="0">' +
                     '<span class="line-l"></span>' +
-                    '<span class="text"></span>' +
+                    '<span class="title"></span>' +
                     '<span class="line-r"></span>' +
                 '</span>'
             );
@@ -937,7 +942,7 @@
         update: function() {
             var title  = this.data.title;
             SeparatorItem.superclass.update.call(this);
-            this.el.find('.bm-item-title .text').toggleClass('h', !title).text(title);
+            this.el.find('.bm-item-title .title').toggleClass('h', !title).text(title);
         }
     });
 })(jQuery, simpleBookmarks);
