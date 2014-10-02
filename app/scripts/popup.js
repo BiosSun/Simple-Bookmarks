@@ -843,7 +843,7 @@
 
             this.el.find('.bm-item-title').attr('href', url)
                    .find('.title').toggleClass('isurl', !title).text(title || url).end()
-                   .find('.desc').toggleClass('h', !desc).text(' | ' + desc).end()
+                   .find('.desc').toggleClass('h', !desc).text(B.extendContentDelimiter + desc).end()
                    .find('.bm-item-favicon img').attr('src', 'chrome://favicon/' + url);
         },
 

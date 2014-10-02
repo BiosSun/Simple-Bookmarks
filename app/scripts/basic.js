@@ -22,6 +22,9 @@
         // 查询浏览记录结果目录（虚拟）节点的 ID
         searchHistoryFolderId: '-3',
 
+        // 说明性内容与标题间的分界符
+        extendContentDelimiter: ' | ',
+
         // 历史记录条目节点 ID 的偏移值
         historyNodeIdOffset: 10,
 
@@ -47,9 +50,9 @@
                 node.title = B._getSeparatorTitle(node);
             }
 
-            descIndex = node.title.indexOf('##');
+            descIndex = node.title.lastIndexOf(B.extendContentDelimiter);
             if (descIndex !== -1) {
-                node.desc = node.title.substring(descIndex + 2);
+                node.desc = node.title.substring(descIndex + B.extendContentDelimiter.length);
                 node.title = node.title.substring(0, descIndex);
             }
 
@@ -73,7 +76,7 @@
             }
 
             if (node.desc) {
-                node.title += '##' + node.desc;
+                node.title += B.extendContentDelimiter + node.desc;
                 delete node.desc;
             }
 
