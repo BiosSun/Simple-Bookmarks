@@ -2772,16 +2772,16 @@ button, input, select {
   background: #e0e0e0;
   color: #D10D0D;
 }
-/* line 186, ../sass/main.scss */
+/* line 187, ../sass/main.scss */
 .bm-item-title .title.isurl {
   color: #999;
 }
-/* line 190, ../sass/main.scss */
+/* line 192, ../sass/main.scss */
 .bm-item-title .desc {
   color: #999;
 }
 
-/* line 195, ../sass/main.scss */
+/* line 197, ../sass/main.scss */
 .bm-item-favicon {
   display: inline-block;
   width: 22px;
@@ -2793,19 +2793,19 @@ button, input, select {
   color: #87A9C4;
 }
 
-/* line 210, ../sass/main.scss */
+/* line 212, ../sass/main.scss */
 .bm-item-bookmark > .bm-item-title > .bm-item-favicon, .bm-item-history > .bm-item-title > .bm-item-favicon {
   font-size: 0;
   line-height: 22px;
 }
-/* line 214, ../sass/main.scss */
+/* line 216, ../sass/main.scss */
 .bm-item-bookmark > .bm-item-title > .bm-item-favicon img, .bm-item-history > .bm-item-title > .bm-item-favicon img {
   vertical-align: middle;
   position: relative;
   top: -1px;
 }
 
-/* line 224, ../sass/main.scss */
+/* line 226, ../sass/main.scss */
 .bm-item-history > .bm-item-title .last-visit-time, .bm-item-history > .bm-item-title .visit-count {
   float: right;
   height: 16px;
@@ -2816,28 +2816,27 @@ button, input, select {
   line-height: 16px;
   color: #999;
 }
-/* line 235, ../sass/main.scss */
+/* line 237, ../sass/main.scss */
 .bm-item-history > .bm-item-title .visit-count {
   width: 3em;
   text-align: right;
   margin-left: 20px;
 }
 
-/* line 243, ../sass/main.scss */
+/* line 247, ../sass/main.scss */
 .bm-item-directory > .bm-item-title > .bm-item-favicon {
   font: 16px/22px FontAwesome;
 }
-/* line 246, ../sass/main.scss */
+/* line 250, ../sass/main.scss */
 .bm-item-directory > .bm-item-title > .bm-item-favicon:before {
   content: "\f07b";
 }
-
-/* line 253, ../sass/main.scss */
+/* line 258, ../sass/main.scss */
 .bm-item-directory.open > .bm-item-title > .bm-item-favicon:before {
   content: "\f07c";
 }
 
-/* line 260, ../sass/main.scss */
+/* line 267, ../sass/main.scss */
 .bm-item-separator > .bm-item-title {
   position: relative;
   display: -webkit-flex;
@@ -2845,45 +2844,45 @@ button, input, select {
   display: flex;
   color: #999;
 }
-/* line 265, ../sass/main.scss */
+/* line 272, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .line-l, .bm-item-separator > .bm-item-title .line-r {
   display: block;
   height: 0;
   margin: 9px 0 0;
   border-bottom: 1px dashed #bbb;
 }
-/* line 272, ../sass/main.scss */
+/* line 279, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .line-l {
   width: 20px;
 }
-/* line 276, ../sass/main.scss */
+/* line 283, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .line-r {
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
 }
-/* line 280, ../sass/main.scss */
+/* line 287, ../sass/main.scss */
 .bm-item-separator > .bm-item-title .title {
   padding: 0 6px;
 }
-/* line 285, ../sass/main.scss */
+/* line 292, ../sass/main.scss */
 .bm-item-separator.selected > .bm-item-title {
   color: #d10d0d;
 }
-/* line 288, ../sass/main.scss */
+/* line 295, ../sass/main.scss */
 .bm-item-separator.selected > .bm-item-title .line-l, .bm-item-separator.selected > .bm-item-title .line-r {
   border-color: #d10d0d;
 }
-/* line 293, ../sass/main.scss */
+/* line 300, ../sass/main.scss */
 .bm-item-separator.selected.less > .bm-item-title {
   color: #999;
 }
-/* line 296, ../sass/main.scss */
+/* line 303, ../sass/main.scss */
 .bm-item-separator.selected.less > .bm-item-title .line-l, .bm-item-separator.selected.less > .bm-item-title .line-r {
   border-color: #bbb;
 }
 
-/* line 302, ../sass/main.scss */
+/* line 309, ../sass/main.scss */
 #bookmarks {
   overflow-y: auto;
   padding: 8px;

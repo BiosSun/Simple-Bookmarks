@@ -183,8 +183,10 @@ button, input, select {
         color: #D10D0D;
     }
 
-    .title.isurl {
-        color: #999;
+    .title {
+        &.isurl {
+            color: #999;
+        }
     }
 
     .desc {
@@ -240,19 +242,23 @@ button, input, select {
     }
 }
 
-.bm-item-directory > .bm-item-title > .bm-item-favicon {
-    font: 16px/22px FontAwesome;
+.bm-item-directory {
+    > .bm-item-title > .bm-item-favicon {
+        font: 16px/22px FontAwesome;
 
-    &:before {
-        // content: "\f114";
-        content: "\f07b";
+        &:before {
+            // content: "\f114";
+            content: "\f07b";
+        }
     }
-}
 
-.bm-item-directory.open > .bm-item-title > .bm-item-favicon {
-    &:before {
-        // content: "\f115";
-        content: "\f07c";
+    &.open {
+        > .bm-item-title > .bm-item-favicon {
+            &:before {
+                // content: "\f115";
+                content: "\f07c";
+            }
+        }
     }
 }
 
