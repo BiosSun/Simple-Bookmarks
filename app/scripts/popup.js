@@ -28,16 +28,6 @@
             buildDefaultList();
         }
 
-        // 绑定书签项的点击事件
-        bmRootList.on('click', '.bm-item-title', function(e) {
-            var itemEl = $(this).closest('.bm-item'),
-                item = itemEl.data('item');
-
-            item.toggle({ keys: e });
-
-            return false;
-        });
-
         // 处理全局按键事件
         doc.on('keyup', function(e) {
             switch (e.keyCode) {
@@ -103,7 +93,28 @@
         });
 
         bmRootList
-            // 使用 tab 键在列表中选择书签条目
+            // 绑定书签项的点击事件
+            .on('click', '.bm-item-title', function(e) {
+                var itemEl = $(this).closest('.bm-item'),
+                    item = itemEl.data('item');
+
+                if (item.type !== BookmarkItem.TYPE_ID) {
+                    item.toggle({keys: e});
+                }
+
+                return false;
+            })
+            .on('dblclick', '.bm-item-title', function(e) {
+                var itemEl = $(this).closest('.bm-item'),
+                    item = itemEl.data('item');
+
+                if (item.type === BookmarkItem.TYPE_ID) {
+                    item.toggle({keys: e});
+                }
+
+                return false;
+            })
+            // 当元素获取到焦点时
             .on('focus', '.bm-item-title', function() {
                 var item = $(this).closest('.bm-item').data('item');
                 selectItem(item);
