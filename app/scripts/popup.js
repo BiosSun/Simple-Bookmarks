@@ -9,6 +9,7 @@
 
         bmRootList = $('#bookmarks'),
         searchInput = $('#search'),
+        searchCleanButton = $('.search-panel > .clean-button'),
 
         // search
         lastSearchText = '',
@@ -130,7 +131,7 @@
             .on('keyup', '.bm-item-title', $.proxy(bmItemKeyEventsHandler, null, bmItemTitleKeyUpHandlers));
 
         searchInput
-            .on('keyup', function() {
+            .on('keyup change', function() {
                 var searchText = this.value;
                 search(searchText);
                 B.storage('search-text', searchText);
@@ -145,6 +146,32 @@
                 if (handler) { handler(); return false; }
                 else { return undefined; }
             });
+
+        // 点击搜索框中的清除按钮时，清空搜索框内的内容
+        searchCleanButton
+            .on('click', function() {
+                searchInput.val('').trigger('change').focus();
+            });
+
+        // 当搜索框中有输入搜索关键字时，隐藏 clean-button，否则显示 clean-button
+        searchInput
+            .on('input change', function() {
+                var searchText = $.trim(this.value);
+
+                if (searchText) {
+                    searchCleanButton.show();
+                }
+                else {
+                    searchCleanButton.hide();
+                }
+            });
+
+        if ($.trim(searchInput.val())) {
+            searchCleanButton.show();
+        }
+        else {
+            searchCleanButton.hide();
+        }
     });
 
     var
