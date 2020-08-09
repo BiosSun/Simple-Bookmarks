@@ -2,8 +2,6 @@ $fa-css-prefix: icon;
 
 @import "vendors/font-awesome/font-awesome";
 
-@import "compass";
-
 @import "jquery.contextMenu";
 
 * {
@@ -38,9 +36,6 @@ button, input, select {
 
 .h {
     display: none;
-}
-
-.form {
 }
 
 .form-group {
@@ -190,16 +185,15 @@ button, input, select {
     margin-left: 25px;
 }
 
-.bm-item {
-}
-
 .bm-item-title {
     display: block;
     color: #333;
     height: 22px;
     line-height: 22px;
 
-    @include ellipsis;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     margin-left: -2700px;
     padding-left: 2700px;

@@ -86,21 +86,16 @@ module.exports = function (grunt) {
             ]
         },
 
-        // Compiles Compass to CSS
-        compass: {
-            src: {
-                options: {
-                    httpPath: '',
-                    cssDir: 'app/styles',
-                    sassDir: 'app/sass',
-                    imageDir: 'app/images',
-                    javascriptsDir: 'app/scripts',
-                    fontsDir: 'app/fonts',
-                    httpStylesheetsPath: 'styles',
-                    httpImagesPath: 'images',
-                    httpJavascriptsPath: 'scripts',
-                    httpFontsPath: 'fonts'
-                }
+        // Compiles sass to CSS
+        sass: {
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: 'app/sass',
+                    src: '*.scss',
+                    dest: 'dist/styles',
+                    ext: '.css'
+                }]
             }
         },
 
@@ -203,11 +198,11 @@ module.exports = function (grunt) {
             },
             scripts: {
                 files: ['app/scripts/**/*.js'],
-                tasks: ['jshint', 'copy', 'replace']
+                tasks: ['copy', 'replace']
             },
             scss: {
                 files: ['app/sass/**/*.{scss,sass}'],
-                tasks: ['compass', 'autoprefixer', 'copy', 'replace']
+                tasks: ['sass', 'autoprefixer', 'copy', 'replace']
             },
             file: {
                 files: ['app/*.{html,json}'],
@@ -220,7 +215,7 @@ module.exports = function (grunt) {
         'clean',
         'mkdir',
 
-        'compass',
+        'sass',
         'autoprefixer',
 
         'bower',
