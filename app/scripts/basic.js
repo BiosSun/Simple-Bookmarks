@@ -92,6 +92,7 @@
                     title: node.title,
                     url: node.url
                 };
+
             chrome.bookmarks.update(id, data, callback);
         },
 
@@ -148,6 +149,26 @@
                     for (var i = 0, l = nodes.length; i < l; i++) {
                         nodes[i] = B.extendNode(nodes[i]);
                     }
+                }
+
+                callback(nodes);
+            });
+        },
+
+
+        getPrimaries: function(callback) {
+            var historyFolderNode = {
+                id: B.historyFolderId,
+                title: '浏览记录',
+            };
+
+            B.getChildren(B.rootFolderId, function(nodes) {
+                var i, l;
+
+                nodes.push(historyFolderNode);
+
+                for (i = 0, l = nodes.length; i < l; i++) {
+                    nodes[i].isPrimaryNode = true;
                 }
 
                 callback(nodes);

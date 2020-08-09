@@ -198,6 +198,7 @@
             }
         }
     },
+
     bmItemTitleKeyDownHandlers = {
         // enter
         13: function(item, e) {
@@ -233,6 +234,7 @@
             }
         }
     },
+
     searchInputKeyUpHandlers = {
         // 在敲击回车键时，打开当前列表中被选中的书签条目或历史记录条目
         13: function() {
@@ -245,6 +247,7 @@
             }
         }
     },
+
     searchInputKeyDownHandlers = {
         // up
         38: function() {
@@ -336,15 +339,8 @@
 
     // 构建默认列表
     function buildDefaultList() {
-        B.getChildren(B.rootFolderId, function(nodes) {
-            var historyFolderNode, i, l;
-
-            historyFolderNode = {
-                id: B.historyFolderId,
-                title: '浏览记录'
-            };
-
-            nodes.push(historyFolderNode);
+        B.getPrimaries(function(nodes) {
+            var i, l;
 
             for (i = 0, l = nodes.length; i < l; i++) {
                 createItem(nodes[i], bmRootList);
@@ -355,7 +351,7 @@
                 text: '',
                 maxResults: 100
             }, function(historys) {
-                var $folderItem = bmRootList.find('#bmitem-' + historyFolderNode.id),
+                var $folderItem = bmRootList.find('#bmitem-' + B.historyFolderId),
                     folderItem = $folderItem.data('item'),
                     i, l;
 
@@ -521,6 +517,10 @@
                     '</li>'
             );
 
+            if (this.data.isPrimaryNode) {
+                this.el.addClass('bm-item-primary');
+            }
+
             this.fill();
             this.titleEl = this.el.find('> .bm-item-title');
 
@@ -638,6 +638,7 @@
         open: function() {
             return this;
         },
+
         close: function(options) {
             options = options || {};
 
@@ -876,8 +877,6 @@
                 desc = this.data.desc;
 
             BookmarkItem.superclass.update.call(this);
-
-            console.info(desc);
 
             this.el.find('.bm-item-title').attr('href', url)
                    .find('.title').toggleClass('isurl', !title).text(title || url).end()
