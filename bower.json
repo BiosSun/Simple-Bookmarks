@@ -5,6 +5,7 @@
     "jquery": "^3.5.1",
     "jquery-ui": "^1.12.1",
     "jQuery-contextMenu": "^2.9.2",
-    "moment": "^2.27.0"
+    "moment": "^2.27.0",
+    "Sortable": "sortablejs#^1.10.2"
   }
 }

@@ -345,3 +345,21 @@ button, input, select {
     position: relative;
     user-select: none;
 }
+
+.sortable-ghost {
+    .bm-item-title {
+        background: #f00 !important;
+    }
+}
+
+.sortable-chosen {
+    .bm-item-title {
+        background: #0f0 !important;
+    }
+}
+
+.sortable-drag {
+    .bm-item-title {
+        background: #00f !important;
+    }
+}

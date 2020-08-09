@@ -705,6 +705,17 @@
                 '</span>',
                 this.sublistEl
             );
+
+            // 绑定排序
+            if (this.id !== B.historyFolderId) {
+                this.sublistEl.sortable({
+                    group: 'nested',
+                    animation: 150,
+                    fallbackOnBody: true,
+                    swapThreshold: 0.65,
+                    direction: 'vertical',
+                });
+            }
         },
 
         update: function() {
