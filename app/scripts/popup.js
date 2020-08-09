@@ -99,7 +99,7 @@
                 var itemEl = $(this).closest('.bm-item'),
                     item = itemEl.data('item');
 
-                if (item.type !== BookmarkItem.TYPE_ID) {
+                if (item.type === DirectoryItem.TYPE_ID) {
                     item.toggle({keys: e});
                 }
 
@@ -109,7 +109,7 @@
                 var itemEl = $(this).closest('.bm-item'),
                     item = itemEl.data('item');
 
-                if (item.type === BookmarkItem.TYPE_ID) {
+                if (item.type !== DirectoryItem.TYPE_ID) {
                     item.toggle({keys: e});
                 }
 
