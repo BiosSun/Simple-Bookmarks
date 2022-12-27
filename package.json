@@ -7,7 +7,7 @@
     "grunt-contrib-sass": "^2.0.0"
   },
   "devDependencies": {
-    "grunt": "^1.2.1",
+    "grunt": "^1.5.3",
     "grunt-autoprefixer": "^3.0.4",
     "grunt-bower-install": "^1.4.1",
     "grunt-bower-task": "^0.5.0",
