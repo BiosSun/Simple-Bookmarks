@@ -12,6 +12,7 @@
     "newcap": true,
     "noarg": true,
     "quotmark": "single",
+    "asi": true,
     "scripturl": "false",
     "undef": true,
     "unused": true,

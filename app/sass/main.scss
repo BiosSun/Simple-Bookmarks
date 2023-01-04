@@ -1,3 +1,5 @@
+@use "sass:math";
+
 $fa-css-prefix: icon;
 
 @import "vendors/font-awesome/font-awesome";
@@ -134,8 +136,8 @@ button, input, select {
         padding: 0;
 
         position: absolute;
-        right: (-$size / 4) + 1px;
-        top: (-$size / 4) + 1px;
+        right: math.div(-$size, 4) + 1px;
+        top: math.div(-$size, 4) + 1px;
 
         background: transparent;
         border: 0;
@@ -259,7 +261,7 @@ button, input, select {
         .last-visit-time, .visit-count {
             float: right;
             height: 16px;
-            margin-top: (22px - 16px) / 2;
+            margin-top: math.div((22px - 16px), 2);
             padding-left: 5px;
             margin-left: 5px;
             border-left: 1px solid #eee;

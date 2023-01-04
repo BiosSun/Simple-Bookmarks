@@ -1,6 +1,8 @@
 // Generated on 2014-07-29 using generator-webapp 0.4.9
 'use strict';
 
+const sass = require('sass');
+
 // # Globbing
 // for performance reasons we're only matching one level down:
 // 'test/spec/{,*/}*.js'
@@ -88,6 +90,9 @@ module.exports = function (grunt) {
 
         // Compiles sass to CSS
         sass: {
+            options: {
+                implementation: sass,
+            },
             dist: {
                 files: [{
                     expand: true,
